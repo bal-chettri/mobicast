@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mcplugin>
+  <id>mc.plugin.vlc</id>
+  <title>VLC</title>
+  <description>VLC plugin for MobiCast</description>
+  <author>Bal Chettri</author>
+  <version>1.0.0</version>
+  <player>vlc.html</player>
+  <main>vlc.js</main>
+  <capabilities>
+    <capability>player</capability>
+  </capabilities>
+</mcplugin>

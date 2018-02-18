@@ -1,0 +1,22 @@
+<br /><br />
+<h2>Configure Drive</h2>
+<ul id="setup-drive-list">
+  <script>
+    var curVol = MC.db.getProp(MC.kDbKeyDriveVol);
+    var drives = MC.toJsArray(MC.storage.getVolumes());
+    for(var i = 0; i < drives.length; i++) {
+      var props = drives[i].split(',');
+      var vol = props[0];
+      if(vol.length != 0) {
+        var path = props[1];
+        var html = '<li vol="' + vol + '" onclick="MC.ui.list.setSelected(this);"';
+        html+= ' class="' + vol == curVol ? 'selected' : 'normal' + '"';
+        html+= '>';
+        html+= '<b>' + vol + '</b>&nbsp;' + path;
+        html+= '</li>';
+        MC.write(html);
+      }
+    }    
+  </script>
+</ul>
+<input value="NEXT" type="button" onclick="onSaveDriveSettings();" />

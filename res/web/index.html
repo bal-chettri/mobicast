@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!--
+ index.html 
+ 
+ Copyright (C) 2018  Bal Chettri
+ Licensed under GNU GPL(https://www.gnu.org/licenses/gpl.html)
+-->
+<html lang="en-US">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <title>MobiCast</title>
+    <link rel="stylesheet" href="style.css" />
+    <script type="text/javascript" src="libs/js-base64/base64.js"></script>
+    <script type="text/javascript" src="mobicast.js"></script>
+    <script type="text/javascript" src="service.js"></script>
+    <script type="text/javascript" src="boot.js"></script>
+    <script type="text/javascript" src="setup.js"></script>
+  </head>
+  <body>
+    <div id="content"></div>
+    <div id="overlay">
+      <div id="notifbar">
+        <span id="notiftext"></span>
+      </div>
+    </div>
+    <div id="debug">
+      <div id="toolbar">
+        <span onclick="MC.ui.toggle('console');">Console</span>
+      </div>
+      <div id="console"></div>
+    </div>
+  </body>
+</html>

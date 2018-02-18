@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!--
+ cpanel.html 
+ 
+ Copyright (C) 2018  Bal Chettri
+ Licensed under GNU GPL(https://www.gnu.org/licenses/gpl.html)
+-->
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=devide-width, initial-scale=1.0" />
+    <title>MobiCast Control Panel</title>
+  </head>
+  <body>
+    Get Channels:<br />
+    <input type="button" style="width:80px" value="Channels"  onclick="getChannels();" />    
+    <br /><br />
+    
+    Get Channel:<br />
+    <input type="button" style="width:80px" value="Channel" onclick="getChannel();" />
+    <input type="text" style="width:50px" id="get_channel_id"" />
+    <br /><br />
+    
+    List Channel:<br />
+    <input type="button" style="width:80px" value="List" onclick="listChannel();" />
+    <input type="text" style="width:50px" id="list_channel_id"" />
+    <br /><br />
+    
+    Media:<br />
+    <input type="text" id="media" style="width:480px" value="https://www.youtube.com/watch?v=YgwX75JQUjc" />
+    <br /><br />    
+    
+    Controls:<br />
+    <input type="button" style="width:130px" value="Play via Youtube"  onclick="playYT();" />
+    &nbsp;&nbsp;&nbsp;
+    
+    <input type="button" style="width:130px" value="Play via VLC"  onclick="playVLC();" />
+    <br /><br />
+    
+    <input type="button" style="width:80px" value="Pause"  onclick="pause();" />
+    <input type="button" style="width:80px" value="Resume" onclick="resume();" />
+    <input type="button" style="width:80px" value="Rewind" onclick="rewind();" />
+    <br /><br />
+    
+    <input type="button" style="width:60px" value="Vol +" onclick="volStep(true);" />
+    <input type="button" style="width:60px" value="Vol -" onclick="volStep(false);" />
+    <input type="button" style="width:80px" value="Mute" onclick="mute();" />
+    <input type="button" style="width:80px" value="Unmute" onclick="unmute();" />
+    <br /><br />
+    
+    Log:<br />
+    <input type="button" style="width:80px" value="Clear" onclick="clearLog();" />
+    <br />
+    <textarea id="output" style="width:480px; height:100px"></textarea>
+  </body>
+</html>
+<script>
+var SERVER = document.location.origin;
+
+function logmsg(s) {
+  var output = document.getElementById('output');
+  s = output.value + s + '\n';
+  output.value = s;
+}
+
+function clearLog() {
+  document.getElementById('output').value = '';
+}
+
+function httpReq(url, options, callback) {
+  var method = 'method' in options ? options['method'] : 'GET';
+  var async = 'async' in options ? options['async'] : true;
+  var headers = 'headers' in options ? options['headers'] : null;
+  var body = 'body' in options ? options['body'] : null;
+  var xhttp = new XMLHttpRequest();
+  if(xhttp == null) {
+    logmsg('Failed to create XMLHttpRequest request.');
+    return false;
+  }
+  xhttp.onreadystatechange = function() {
+    if(this.readyState == 4) {      
+      callback(this);
+    }
+  };
+  xhttp.open(method, url, async);
+  if(headers != null) {
+    for(name in headers) {
+      xhttp.setRequestHeader(name, headers[name]);
+    }
+  }
+  
+  var slog = url;
+  if(method == 'POST') {
+    slog+= '\n';
+    slog+= body || '(null)';    
+  }
+  slog+= '\n';
+  logmsg(slog);
+  
+  xhttp.send(body);
+  return true;
+}
+
+function respHandler(xhttp) {
+  var slog;
+  if(xhttp.status == 200) {
+    slog = xhttp.responseText;
+  } else {
+    slog = 'Request failed with status code ' + xhttp.status;
+  }
+  slog+= '\n';
+  slog+= '---------------------------------------------------------------\n';
+  logmsg(slog);
+}
+
+function httpGet(url, callback) {
+  callback = callback || respHandler;
+  return httpReq(url, { }, callback);
+}
+
+function httpPost(url, body, callback) {
+  callback = callback || respHandler;
+  return httpReq(url, {"method": "POST", "body": body}, callback);
+}
+
+function API(surl) {
+  return SERVER + surl;
+}
+
+function getChannels() {
+  httpGet(API('/services/media-api.jss?cmd=get_channels'));
+}
+
+function getChannel() { 
+  httpGet(API('/services/media-api.jss?cmd=get_channel&channel_id=' + document.getElementById('get_channel_id').value));
+}
+
+function listChannel() {
+  httpGet(API('/services/media-api.jss?cmd=list_channel&channel_id=' + document.getElementById('list_channel_id').value));
+}
+
+function play(type) {
+  var media = document.getElementById('media').value;
+  var body = '{"type": "' + type + '", "videoURL": "' + media + '"}';
+  httpPost(API('/services/media-control.jss?cmd=play_media'), body);
+}
+
+function playYT() {  
+  play('mc.plugin.yt');
+}
+
+function playVLC() {
+  play('mc.plugin.vlc');
+}
+
+function pause() {
+  httpGet(API('/services/media-control.jss?cmd=pause_media'));
+}
+
+function resume() {
+  httpGet(API('/services/media-control.jss?cmd=resume_media'));
+}
+
+function rewind() {
+  httpGet(API('/services/media-control.jss?cmd=rewind_media'));
+}
+
+function volStep(stepUp) {
+  if(stepUp) {
+    httpGet(API('/services/media-control.jss?cmd=vol_up'));
+  } else {
+    httpGet(API('/services/media-control.jss?cmd=vol_down'));
+  }
+}
+
+function mute() {
+  httpGet(API('/services/media-control.jss?cmd=vol_mute'));
+}
+
+function unmute() {
+  httpGet(API('/services/media-control.jss?cmd=vol_unmute'));
+}
+
+</script>
