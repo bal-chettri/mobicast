@@ -383,20 +383,14 @@ window.onload = function() {
 
     // Content APIs
     MC.setContent = function(html) {
-      // MC.$('content').innerHTML = html;
-      
-      // On IE 11, setting innerHTML leaves the rendered HTML non-interactive. 
-      // Also W3C doesn't recommend its use. To fix this, destroy and recreate 
-      // the 'content' node.
-      var content = MC.$('content');
-      var parentElem = content.parentElement;
-      parentElem.removeChild(content);
-      
-      content = document.createElement('div');
+      var prevContent = MC.$('content');
+      var parentElem = prevContent.parentElement;
+
+      var content = document.createElement('div');
       content.id = 'content';
       content.innerHTML = html;
       
-      parentElem.appendChild(content);
+      parentElem.replaceChild(content, prevContent);
     }
     MC.loadContent = function(url) {
       MC.httpGet(url, function(xhttp) {
