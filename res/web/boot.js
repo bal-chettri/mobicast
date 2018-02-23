@@ -7,8 +7,7 @@
 function mc_main() {
   var _MODULE_ = 'MobiCast';
   
-  MC.log(_MODULE_, 'Initializing...');  
-  return;
+  MC.log(_MODULE_, 'Initializing...');
   
   var setup = MC.db.getProp(MC.kDbKeySetupFlag) != 1;
   setup = setup || !MC.storage.mounted;
@@ -17,12 +16,13 @@ function mc_main() {
     MC.log(_MODULE_, 'Running setup...');
     MC.setup = { };
     MC.setup.init = function() {  
-      this.views = ['setup-drive.html'];
+      this.views = ['setup-drive.html', 'setup-phone.html'];
       this.index = 0;
       return this;
     }
     MC.setup.next = function() {
       if(this.index == this.views.length) {
+        MC.db.setProp(MC.kDbKeySetupFlag, 1);
         MC.loadContent('home.html');
       } else {
         var view = this.views[this.index++];
