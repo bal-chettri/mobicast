@@ -157,20 +157,26 @@ window.onload = function() {
       if(!root) {
         root = MC.$('content');
       }
-      // Replacing <script> directly removes it from DOM immediately
-      // so use a temporary array.
       var domScripts = root.getElementsByTagName('script');
       if(domScripts.length > 0) {
+        // Replacing <script> directly removes it from DOM immediately
+        // so use a temporary array.
         var scripts = [];
-        for(var index in domScripts) {
+        for(var index = 0; index < domScripts.length; index++) {
           scripts.push(domScripts[index]);
         }
         for(var index in scripts) {
           MC._curScript = scripts[index];
           MC._writeBuff = null;
-          eval(MC._curScript.innerHTML);
+
+          var parentElem = MC._curScript.parentElement;
+          var script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.text = MC._curScript.innerHTML;
+          parentElem.replaceChild(script, MC._curScript);
+
           if(MC._writeBuff != null) {
-            MC._curScript.outerHTML = MC._writeBuff;
+            script.outerHTML = MC._writeBuff;
           }
         }
         MC._curScript = MC._writeBuff = null;
