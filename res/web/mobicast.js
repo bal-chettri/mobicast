@@ -484,22 +484,23 @@ window.onload = function() {
       'AppCodeName: ' + navigator.appCodeName + '<br />' +
       'Product: ' + navigator.product + '<br />' +
       'AppVersion: ' + navigator.appVersion + '<br />' +
-      'UserAgent: ' + navigator.userAgent + '<br /><br />'  +      
-      'PostMessage support: ' + typeof window.postMessage + '<br /><br/ >' +
-      'Typed array support: ' + typeof Uint8Array + '<br /><br/ >' + 
-      'window.btoa support: ' + typeof window.btoa + '<br /><br/ >' + 
-      'MC.isIE: ' + MC.isIE + '<br /><br />'
+      'UserAgent: ' + navigator.userAgent + '<br /><br />'  +
+      'MC.isIE: ' + MC.isIE + '<br />' + 
+      'PostMessage support: ' + (typeof window.postMessage == 'function' ? 'Present' : 'Missing') + '<br />' +
+      'Typed array support: ' + (typeof Uint8Array == 'function' ? 'Present' : 'Missing') + '<br />' + 
+      'btoa support: ' + (typeof window.btoa == 'function' ? 'Present' : 'Missing') + '<br />' +
+      '<br />'
     );
     
     MC.log(_MODULE_, 'Initializing database...');
     MC.db.open();
 
     MC.log(_MODULE_, 'Checking drive...');
-    var driveVol = MC.db.getProp(MC.kDbKeyDriveVol)
+    var driveVol = MC.db.getProp(MC.kDbKeyDriveVol);
     if(driveVol == null) {
       MC.log(_MODULE_, 'Drive not configured.');
     } else {
-      MC.log(_MODULE_, 'Drive volume = ' + driveVol + '');
+      MC.log(_MODULE_, 'Drive volume = ' + driveVol);
       MC.mountStorage(driveVol);
     }
 
