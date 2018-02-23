@@ -1,3 +1,18 @@
-<br /><br />
-<h2>Configure Phone</h2>
-<input value="SAVE" type="button" onclick="onSavePhoneSettings();" />
+<div style="margin:60px;">
+  <h2>Setup Phone</h2>
+  <p>
+    Launch the Mobicast app on your smartphone and wait for pairing. Once paired,
+    you'll be able to use your smartphone as a controlling device.
+  </p>
+  <p>
+    Click SAVE to confirm your settings and start using Mobicast.
+  </p>
+  <br />
+  <input type="button" value="SAVE" onclick="onSavePhoneSettings();" />
+</div>
+<script>
+function onSavePhoneSettings() {
+  MC.notify('Your phone is ready for use with MobiCast.');
+  MC.setup.next();
+}
+</script>
