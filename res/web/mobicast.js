@@ -56,7 +56,8 @@ window.onload = function() {
     }
 
     // Show boot logo.
-    MC.$('content').innerHTML = '<br /><img src="logo.png" /><br />';
+    MC.$('content').innerHTML = 
+    '<table width="100%" height="100%"><tr><td align="center"><img src="logo.png" /></td></tr></table>';
 
     // Mobicast core objects.
     MC.engine = _mobicast_engine;    
