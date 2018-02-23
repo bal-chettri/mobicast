@@ -97,6 +97,8 @@ window.onload = function() {
     MC.kDbKeySetupFlag = 'mobicast.setup.flag';
     MC.kDbKeyDriveVol = 'mobicast.drive.vol';
 
+    MC.kNotificationFadeInTime = 1000;
+    MC.kNotificationFadeOutTime = 3000;
     MC.kNotificationTimeout = 3000;
 
     // Debugging APIs
@@ -432,52 +434,14 @@ window.onload = function() {
       return null;
     }
 
-    MC.ui._fade = null;
-    MC.ui.cancelFade = function() {
-      if(MC.ui._fade != null) {
-        clearInterval(MC.ui._fade);
-        MC.ui._fade = null;
-      }
-    }
-    MC.ui.fadeIn = function(id, duration, value) {
-      MC.ui.cancelFade();
-      MC.log(_MODULE_, 'fadeid: starting fadeIn');
-      MC.$(id).style.display = 'block';
-      if(MC.isIE) {
-        var opacity = Math.floor(value * 100.0);
-        MC.$(id).style.filter = 'alpha(opacity=' + opacity + ')';
-      } else {
-        var t = MC.$(id);
-        var delta = (value - t.style.opacity) / duration;
-        var interval = Math.floor(1000.0 / 12.0);
-        var aid = setInterval(function() {
-          var opacity = Math.min(t.style.opacity + delta, 1.0);
-          t.style.opacity = opacity;
-          MC.log(_MODULE_, 'fadeid: stepping opacity = ' + opacity);
-          if(opacity == 1.0) {
-            MC.log(_MODULE_, 'fadeid: stopping');
-            clearInterval(aid);
-          }
-        }, interval);
-      }
-    }
-    MC.ui.fadeOut = function(id, duration, value) {
-      MC.ui.cancelFade();
-      if(MC.isIE) {
-        var opacity = Math.floor(value * 100.0);
-        MC.$(id).style.filter = 'alpha(opacity=' + opacity + ')';
-        MC.$(id).style.display = 'none';
-      }
-    }
-
     // Notification APIs
     MC.notify = function(msg) {
       MC.log(_MODULE_, 'Showing notification bar. Message = ' + msg);
       MC.$('notiftext').innerHTML = msg;
-      MC.ui.fadeIn('notifbar', 1.0, 1.0);
+      $('#notifbar').fadeIn(MC.kNotificationFadeInTime);
       setTimeout(function() {
         MC.log(_MODULE_, 'Hiding notification bar.');
-        MC.ui.fadeOut('notifbar', 1.0, 1.0);
+        $('#notifbar').fadeOut(MC.kNotificationFadeOutTime);
       }, MC.kNotificationTimeout);
     }
 
