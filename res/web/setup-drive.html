@@ -10,7 +10,7 @@
         if(vol.length != 0) {
           var path = props[1];
           var html = '<li vol="' + vol + '" onclick="MC.ui.list.setSelected(this);"';
-          html+= ' class="' + vol == curVol ? 'selected' : 'normal' + '"';
+          html+= ' class="' + (vol == curVol ? 'selected' : 'normal') + '"';
           html+= '>';
           html+= '<b>' + vol + '</b>&nbsp;' + path;
           html+= '</li>';
