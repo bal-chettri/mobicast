@@ -247,7 +247,7 @@ MC.registerService("/services/media-control.jss", function(_req, _resp) {
   catch(e) {
     var result = {
       'status': 'error',
-      'message': 'Internal error occured: ' + e.message + ', Line no: ' + e.lineNumber
+      'message': 'Internal error occurred: ' + e.message + ', Line no: ' + e.lineNumber
     };
     _req.replyText(200, JSON.stringify(result), "application/json");
     return true;
