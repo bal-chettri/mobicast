@@ -12,6 +12,18 @@
     <title>MobiCast Control Panel</title>
   </head>
   <body>
+    Pair phone:<br />
+    Id:&nbsp;<input type="text" id="phone_id" style="width:100px" value="0123456789" />
+    &nbsp;&nbsp;
+    Name:&nbsp;<input type="text" id="phone_name" style="width:100px" value="CPanel" />
+    <input type="button" style="width:80px" value="Pair"  onclick="pairPhone();" />
+    <br /><br />
+    
+    Activate phone:<br />
+    Passcode:&nbsp;<input type="text" id="phone_passcode" style="width:100px" value="" />
+    <input type="button" style="width:80px" value="Activate"  onclick="activatePhone();" />
+    <br /><br />
+    
     Get Channels:<br />
     <input type="button" style="width:80px" value="Channels"  onclick="getChannels();" />    
     <br /><br />
@@ -125,6 +137,20 @@ function httpPost(url, body, callback) {
 
 function API(surl) {
   return SERVER + surl;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function pairPhone() {
+  var id = document.getElementById('phone_id').value;
+  var name = document.getElementById('phone_name').value;
+  httpGet(API('/services/app.jss?cmd=pair_phone&id=' + id + '&name=' + name));
+}
+
+function activatePhone() {
+  var id = document.getElementById('phone_id').value;
+  var code = document.getElementById('phone_passcode').value;
+  httpGet(API('/services/app.jss?cmd=activate_phone&id=' + id + '&code=' + code));
 }
 
 function getChannels() {

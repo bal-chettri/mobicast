@@ -97,6 +97,10 @@ window.onload = function() {
 
     MC.kDbKeySetupFlag = 'mobicast.setup.flag';
     MC.kDbKeyDriveVol = 'mobicast.drive.vol';
+    MC.kDbKeyPhoneId = 'mobicast.phone.id';
+    MC.kDbKeyPhoneName = 'mobicast.phone.name';
+    MC.kDbKeyPhoneStatus = 'mobicast.phone.status';
+    MC.kDbKeyPhonePasscode = 'mobicast.phone.passcode';
 
     MC.kNotificationFadeInTime = 1000;
     MC.kNotificationFadeOutTime = 3000;

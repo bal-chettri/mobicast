@@ -1,9 +1,12 @@
 <div style="margin:60px;">
   <h2>Setup Phone</h2>
   <p>
-    Launch the Mobicast app on your smartphone and wait for pairing. Once paired,
-    you'll be able to use your smartphone as a controlling device.
-  </p>
+    Launch Mobicast app on your smartphone and wait for pairing. Once paired,
+    you'll be able to use your phone as a controlling device.
+  </p>  
+  <div id="_mc_phone_setup" class="panel">
+    Waiting for your phone to connect...
+  </div>
   <p>
     Click SAVE to confirm your settings and start using Mobicast.
   </p>
@@ -11,8 +14,15 @@
   <input type="button" value="SAVE" onclick="onSavePhoneSettings();" />
 </div>
 <script>
+// Reset phone status.
+MC.db.setProp(MC.kDbKeyPhoneStatus, 0);
+
 function onSavePhoneSettings() {
-  MC.notify('Your phone is ready for use with MobiCast.');
-  MC.setup.next();
+  if(MC.db.getProp(MC.kDbKeyPhoneStatus) == 2) {
+    MC.notify('Your phone <b>' +  MC.db.getProp(MC.kDbKeyPhoneName) + '</b> is ready for use.');
+    MC.setup.next();
+  } else {
+    MC.notify('Phone has not been paired.');
+  }
 }
 </script>

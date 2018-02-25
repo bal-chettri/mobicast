@@ -87,3 +87,12 @@ li.normal {
 li.selected {
     color: #00ffe9;
 }
+
+div.panel
+{
+    background-color: #ffffff;
+    color: #000000;
+    border-radius:8px;
+    padding: 16px;
+    line-height:200%;
+}
