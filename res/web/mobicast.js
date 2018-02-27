@@ -16,6 +16,7 @@ window.onload = function() {
       return false;
     }
 
+    // The Mobicast namespace.
     MC = {};
     
     var isIE = navigator.userAgent.match("MSIE ([0-9]{1,}[\.0-9]{0,})");
@@ -30,18 +31,6 @@ window.onload = function() {
     }
     MC.toJsArray = function(arr) {
       return MC.isIE ? (new VBArray(arr)).toArray() : arr;
-    }
-    // #Deprecated, use toNativeArray instead.
-    MC.toVbArray = function(arr) {
-      if(MC.isIE) {
-        var dict = new ActiveXObject("Scripting.Dictionary");
-        var index = 0;
-        for(var i in arr) {
-          dict.add(index++, arr[i]);
-        }
-        return dict.Items();
-      }
-      return arr;
     }
     MC.toNativeArray = function(arr) {
       if(MC.isIE) {
@@ -95,6 +84,7 @@ window.onload = function() {
     MC.kPlayerStatePaused = 3;
     MC.kPlayerStateFinished = 4;
 
+    // Database key names for system properties.
     MC.kDbKeySetupFlag = 'mobicast.setup.flag';
     MC.kDbKeyDriveVol = 'mobicast.drive.vol';
     MC.kDbKeyPhoneId = 'mobicast.phone.id';
@@ -406,7 +396,7 @@ window.onload = function() {
       });
     }
     MC.clearContent = function() {
-      MC.$('content').innerHTML = '';
+      MC.setContent('');
     }
 
     // UI APIs
