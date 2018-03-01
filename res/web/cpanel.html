@@ -38,6 +38,10 @@
     <input type="text" style="width:50px" id="list_channel_id"" />
     <br /><br />
     
+    Get Plugins:<br />
+    <input type="button" style="width:80px" value="List" onclick="getPlugins();" />
+    <br /><br />
+    
     List Media Handlers:<br />
     <input type="button" style="width:80px" value="List" onclick="listMediaHandlers();" />
     <br /><br />
@@ -67,7 +71,7 @@
     Log:<br />
     <input type="button" style="width:80px" value="Clear" onclick="clearLog();" />
     <br />
-    <textarea id="output" style="width:480px; height:100px"></textarea>
+    <textarea id="output" style="width:480px; height:200px"></textarea>
   </body>
 </html>
 <script>
@@ -120,7 +124,7 @@ function httpReq(url, options, callback) {
 function respHandler(xhttp) {
   var slog;
   if(xhttp.status == 200) {
-    slog = xhttp.responseText;
+    slog = JSON.stringify(JSON.parse(xhttp.responseText), null, '  ');
   } else {
     slog = 'Request failed with status code ' + xhttp.status;
   }
@@ -167,6 +171,10 @@ function getChannel() {
 
 function listChannel() {
   httpGet(API('/services/media-api.jss?cmd=list_channel&channel_id=' + document.getElementById('list_channel_id').value));
+}
+
+function getPlugins() {
+  httpGet(API('/services/media-api.jss?cmd=get_plugins'));
 }
 
 function listMediaHandlers() {

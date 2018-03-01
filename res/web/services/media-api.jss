@@ -84,8 +84,17 @@ var GetPluginsAPI = {
     if(caps & MC.kPluginCapabilityPlayer) {
       pmo['capabilities'].push('player');
     }
-    if((caps & MC.kPluginCapabilityMediaSource) && plugin != undefined) {
-      pmo['filters'] = plugin.getMediaSource().getSearchFilters();
+    
+    if(plugin != undefined) {
+      if((caps & MC.kPluginCapabilityMediaSource)) {
+        var mediaSource = plugin.getMediaSource();
+        pmo['filters'] = mediaSource.getSearchFilters();
+        pmo['media_types'] = mediaSource.getMediaTypes();
+      }
+      if((caps & MC.kPluginCapabilityPlayer)) {
+        var mediaPlayer = plugin.getPlayer();
+        pmo['media_formats'] = mediaPlayer.getMediaFormats();
+      }
     }
     
     return pmo;
