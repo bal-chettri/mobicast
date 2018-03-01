@@ -38,6 +38,10 @@
     <input type="text" style="width:50px" id="list_channel_id"" />
     <br /><br />
     
+    List Media Handlers:<br />
+    <input type="button" style="width:80px" value="List" onclick="listMediaHandlers();" />
+    <br /><br />
+    
     Media:<br />
     <input type="text" id="media" style="width:480px" value="https://www.youtube.com/watch?v=YgwX75JQUjc" />
     <br /><br />    
@@ -163,6 +167,10 @@ function getChannel() {
 
 function listChannel() {
   httpGet(API('/services/media-api.jss?cmd=list_channel&channel_id=' + document.getElementById('list_channel_id').value));
+}
+
+function listMediaHandlers() {
+  httpGet(API('/services/media-api.jss?cmd=list_media_handlers'));
 }
 
 function play(format, player) {

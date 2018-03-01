@@ -390,6 +390,34 @@ var ListChannelAPI = {
   }
 };
 
+//
+// ListMediaHandlersAPI
+//
+var ListMediaHandlersAPI = { 
+  main: function(_req) {
+    var result = {
+      'status': 'success',
+      'handlers': {}
+    };
+
+    var handlers = MC.toJsArray(MC.mm.listMediaHandlers());
+    
+    var length = handlers.length;
+    for(var i = 0; i < length; i++) {
+      var info = handlers[i];
+      
+      var index = info.indexOf('/');
+      var format = info.substr(0, index);
+      var pluginId = info.substr(index + 1);
+      
+      result.handlers[format] = pluginId;
+    }
+
+    _req.replyText(200, JSON.stringify(result), "application/json");
+    return true;
+  }
+};
+
 // Register service.
 MC.registerService("/services/media-api.jss", function(_req, _resp) {
   try {
@@ -417,7 +445,11 @@ MC.registerService("/services/media-api.jss", function(_req, _resp) {
     else if(cmd == 'list_channel')
     {
       return ListChannelAPI.main(_req, qs);
-    }       
+    }
+    else if(cmd == 'list_media_handlers')
+    {
+      return ListMediaHandlersAPI.main(_req);
+    }
     else
     {
       var result = {
