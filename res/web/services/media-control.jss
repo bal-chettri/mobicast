@@ -11,10 +11,10 @@ API: Play media
 URL: media-control.jss?cmd=play_media
 POST:
 {
-    "type": "media-type",
-    "local": true | false,
-    "videoURL": "http://media-content-url/",
-    "thumbnailURL": http://media-thumbnail-url/"
+    "mediaUrl": "content-url",
+    "format": "media-format",
+    "player": "plugin-id",
+    "registerPlayer": boolean
 }
 
 API: Pause media
@@ -39,8 +39,8 @@ var PlayMediaAPI = {
       if(!this._validateMedia(media)) {
         _req.replyText(200, this._errorResult('Invalid media JSON.'), "application/json");
       } else {
-        var type = media['type'];
-        var pinfo = MC.findPlugin(type);
+        var pid = media['player'];
+        var pinfo = MC.findPlugin(pid);
         if(pinfo == null) {
           _req.replyText(200, this._errorResult('Plugin not found.'), "application/json");
         } else if(pinfo.plugin == undefined) {
@@ -49,17 +49,26 @@ var PlayMediaAPI = {
           var capabilities = pinfo.meta.capabilities;
           if(!(capabilities & MC.kPluginCapabilityPlayer)) {
             _req.replyText(200, this._errorResult('Plugin doesn\'t support playback.'), "application/json");
-          } else if(!MC.activatePlugin(type)) {
-            _req.replyText(200, this._errorResult('Failed to activate plugin.'), "application/json");
           } else {
-            var url = media['videoURL'];
-            if(pinfo.plugin.getPlayer().play(url)) {
-              var result = {
-                'status': 'success'
-              }
-              _req.replyText(200, JSON.stringify(result), "application/json");
+            var format = media['format'];
+            var formats = pinfo.plugin.getPlayer().getMediaFormats();
+            if(formats.indexOf(format) < 0) {
+              _req.replyText(200, this._errorResult('Plugin doesn\'t support the format.'), "application/json");
+            } else if(!MC.activatePlugin(pid)) {
+              _req.replyText(200, this._errorResult('Failed to activate the plugin.'), "application/json");
             } else {
-              _req.replyText(200, this._errorResult('Failed to play media.'), "application/json");
+              var url = media['mediaUrl'];
+              if(pinfo.plugin.getPlayer().play(url)) {
+                var result = {
+                  'status': 'success'
+                }
+                if('registerPlayer' in media && media['registerPlayer'] == true) {
+                  MC.mm.registerMediaHandler(format, pid);
+                }
+                _req.replyText(200, JSON.stringify(result), "application/json");
+              } else {
+                _req.replyText(200, this._errorResult('Failed to play media.'), "application/json");
+              }
             }
           }
         }
@@ -71,11 +80,19 @@ var PlayMediaAPI = {
       if(!OBJECT.isObject(media)) {
         return false;
       }
-      if(!OBJECT.has(media, 'type', 'string')) {
+      if(!OBJECT.has(media, 'mediaUrl', 'string')) {
         return false;
       }
-      if(!OBJECT.has(media, 'videoURL', 'string')) {
+      if(!OBJECT.has(media, 'format', 'string')) {
         return false;
+      }
+      if(!OBJECT.has(media, 'player', 'string')) {
+        return false;
+      }
+      if('registerPlayer' in media) {
+        if(!OBJECT.has(media, 'registerPlayer', 'boolean')) {
+          return false;
+        }
       }
       return true;
     },

@@ -165,18 +165,23 @@ function listChannel() {
   httpGet(API('/services/media-api.jss?cmd=list_channel&channel_id=' + document.getElementById('list_channel_id').value));
 }
 
-function play(type) {
+function play(format, player) {
   var media = document.getElementById('media').value;
-  var body = '{"type": "' + type + '", "videoURL": "' + media + '"}';
+  var body = JSON.stringify({
+    "mediaUrl": media,
+    "format": format,
+    "player": player,
+    "registerPlayer": true
+  });
   httpPost(API('/services/media-control.jss?cmd=play_media'), body);
 }
 
-function playYT() {  
-  play('mc.plugin.yt');
+function playYT() {
+  play('.youtube', 'mc.plugin.yt');
 }
 
 function playVLC() {
-  play('mc.plugin.vlc');
+  play('.youtube', 'mc.plugin.vlc');
 }
 
 function pause() {

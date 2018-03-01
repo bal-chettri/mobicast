@@ -14,6 +14,24 @@ _vlc.player = {
   ready: false
 };
 
+_vlc.player.getMediaFormats = function() {
+  return [
+    '.3gp',
+    '.avi',
+    '.flv',
+    '.mkv',
+    '.mov',
+    '.m4v',
+    '.mp4',
+    '.mpg',
+    
+    '.mp3',
+    '.ogg',
+    
+    '.youtube'
+  ];
+}
+
 _vlc.player.play = function(url) {
   this.mediaURL = url;
   MC.log('VLC', 'Loading media ' + this.mediaURL);

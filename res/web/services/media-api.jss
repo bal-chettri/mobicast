@@ -83,7 +83,7 @@ var GetPluginsAPI = {
     }
     if(caps & MC.kPluginCapabilityPlayer) {
       pmo['capabilities'].push('player');
-    }    
+    }
     if((caps & MC.kPluginCapabilityMediaSource) && plugin != undefined) {
       pmo['filters'] = plugin.getMediaSource().getSearchFilters();
     }
@@ -374,10 +374,10 @@ var ListChannelAPI = {
     var media = {
       'type': media.type,
       'title': media.title,
-      'videoURL': media.videoURL,
-      'thumbnailURL': media.thumbnailURL,
+      'mediaUrl': media.mediaUrl,
+      'thumbnailUrl': media.thumbnailUrl,
       'duration': media.duration,
-      'local': media.local
+      'format': media.format
     };
     return media;
   },
