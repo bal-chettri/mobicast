@@ -58,11 +58,10 @@ window.onload = function() {
     MC.VERSION = MC.engine.version;
     MC.DEBUG = MC.engine.debug;
 
-    MC.kMediaTypeInvalid =  0;
-    MC.kMediaTypeImage = 1;
-    MC.kMediaTypeMusic = 2;
-    MC.kMediaTypeVideo = 4;
-    MC.kMediaTypeAll = MC.kMediaTypeImage | MC.kMediaTypeMusic | MC.kMediaTypeVideo;
+    // Media types.
+    MC.kMediaTypeImage = 'image';
+    MC.kMediaTypeMusic = 'music';
+    MC.kMediaTypeVideo = 'video';
 
     // Plugin features
     MC.kPluginCapabilityMediaSource = 1;
