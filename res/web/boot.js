@@ -25,7 +25,7 @@ function mc_main() {
         MC.db.setProp(MC.kDbKeySetupFlag, 1);
         MC.loadContent('home.html');
       } else {
-        var view = this.views[this.index++];
+        var view = 'setup/' + this.views[this.index++];
         MC.log(_MODULE_, 'Loading setup ' + this.index + ' of ' + 
                this.views.length + ': ' + view);
         MC.loadContent(view);
