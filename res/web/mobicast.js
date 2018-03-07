@@ -563,8 +563,8 @@ function _mc_js_plugin_get_media_extraction_tags(pluginid) {
   if(mediaSource != null) {
     var tags = mediaSource.getMediaExtractionTags();
       tags = MC.toNativeArray([
-        MC.toNativeArray(tags.videoURL),
-        MC.toNativeArray(tags.thumbnailURL),
+        MC.toNativeArray(tags.mediaUrl),
+        MC.toNativeArray(tags.thumbnailUrl),
         MC.toNativeArray(tags.duration),
         MC.toNativeArray(tags.title)
       ]);
