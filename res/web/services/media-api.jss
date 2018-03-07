@@ -319,7 +319,7 @@ var AddChannelAPI = {
         }
         var type = typeof search.filters[key];
         if((key == 'size' && type == 'number') ||
-           (key =='date-range' && type == 'string') ||
+           (key == 'date-range' && type == 'string') ||
            (key == 'subtitles' && type == 'boolean') ||
            (key == 'type' && type == 'string') ||
            (key == 'quality' && type == 'string') ||

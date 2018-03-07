@@ -181,8 +181,8 @@ window.onload = function() {
 
     // Send HTTP request with advanced options.
     // Supported fields are:
-    // [Options] method = GET | POST etc. Default is GET.
-    // [Optional] async = true | false
+    // [Optional] method = GET | POST etc. Default is GET.
+    // [Optional] async = true | false. Default is GET.
     // [Optional] headers = object
     // [Optional] body = request body for POST
     MC.httpReq = function(url, options, callback) {
@@ -668,7 +668,6 @@ if(typeof(BASE64) == 'undefined') {
   
   // Returns array of bytes from base64 encoded string.
   BASE64.from = function(str) {
-    // return Array.from(Base64.decode(str));
     return Base64.decode(str).split("");
   }
 }
