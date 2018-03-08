@@ -15,9 +15,9 @@ void Log(const char *mod, const char *format, ...)
     if(!mod || !format)
     {
 #ifdef HTTP_PLATFORM_WIN
-        OutputDebugString("\r\n");
+        OutputDebugString("\n");
 #else
-        printf("\r\n");
+        printf("\n");
 #endif
     }
     else

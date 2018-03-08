@@ -12,7 +12,7 @@
 namespace http
 {
 
-/** Stream class. Ouput stream with linear growth. */
+/** Stream class. Output stream with linear growth. */
 class Stream
 {
 public:

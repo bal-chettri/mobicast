@@ -11,7 +11,7 @@
 
 // Disable warnings
 #ifdef _MSC_VER
-#   pragma warning(disable: 4996) // deprecated warnings
+#   pragma warning(disable: 4996) // depreciated warnings
 #endif
 
 // Define platform identifier macros. Currently, only Windows and OSX
