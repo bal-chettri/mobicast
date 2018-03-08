@@ -1,0 +1,7 @@
+lib/win32/libcurl_a_debug.lib:
+  mode=static DEBUG=yes
+  libcurl-vc-x86-debug-static-ipv6-sspi-winssl
+
+lib/win32/libcurl_a.lib:
+  mode=static
+  libcurl-vc-x86-release-static-ipv6-sspi-winssl
