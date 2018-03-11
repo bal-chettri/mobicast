@@ -18,11 +18,12 @@ enum Error
     kErrorNone = 0,
     kErrorReadClient,
     kErrorWriteClient,
+    kErrorDisconnected,
     kErrorProtocol,
     kErrorProtocolVersion,
     kErrorInvalidState,
     kErrorMemory,
-    kErrorIO,
+    kErrorIO
 };
 
 /** StatusCode enum. HTTP response status code enumerations. */
