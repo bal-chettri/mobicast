@@ -11,7 +11,6 @@ namespace http
 
 RequestParser::RequestParser(Request *request) :
     _request(request),
-    _head(NULL),
     _buff(NULL),
     _buffsize(0),
     _bufflen(0),
@@ -35,11 +34,6 @@ void RequestParser::Close()
 int RequestParser::GetState() const
 {
     return _state;
-}
-
-const char *RequestParser::GetHead() const
-{
-    return _buff;
 }
 
 void RequestParser::Reset()

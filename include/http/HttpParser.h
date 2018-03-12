@@ -40,6 +40,7 @@ public:
         kStateHdrEnd            // <CRLF>
     };
 
+private:
     /** MatchFunc function type for token matching functions. The match function should return 1 
       * when token is matched, otherwise 0. */
     typedef int (RequestParser::*MatchFunc)();
@@ -67,9 +68,6 @@ public:
 
     /** Returns the current parser state. */
     int GetState() const;
-
-    /** Returns the head pointer in the buffer. */
-    const char *GetHead() const;    
 
     /** Resets the parser state. */
     void Reset();
@@ -106,7 +104,6 @@ private:
     int matchf_hdr_line();
 
     Request *           _request;       // Request object
-    char *              _head;          // Begining of current token
     char *              _buff;          // Bufffer
     size_t              _buffsize;      // Actual buffer size
     size_t              _bufflen;       // Length of buffer
