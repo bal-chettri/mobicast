@@ -34,7 +34,7 @@ enum StatusCode
     kStatusOk = 200,
     kStatusCreated = 201,
     kStatusAccepted = 202,
-    kStatusNonAuthorativeInformation = 203,
+    kStatusNonAuthoritativeInformation = 203,
     kStatusNoContent = 204,
     kStatusResetContent = 205,
     kStatusPartialContent = 206,
