@@ -284,7 +284,7 @@ int Request::Reply(int status_code, const char *status_msg, const char *text, co
 {
     int ret;
     size_t size = strlen(text);
-    _resp->SetStatus(status_code, status_msg);    
+    _resp->SetStatus(status_code, status_msg);
     _resp->SetContentLength(size);
     _resp->SetHeader("Content-Type", content_type ? content_type : kDefaultMimeType);
     if((ret = _resp->WriteHeaders())) {
