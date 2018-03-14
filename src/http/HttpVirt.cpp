@@ -39,7 +39,7 @@ VirtualDirectory::VirtualDirectory(const char *baseDir)
     // Make sure the canonical base path is also an absolute path.
     assert(IsPathAbsolute(_base_path.c_str()));
 
-    // Append a path seperator at the end of base path.
+    // Append a path separator at the end of base path if required.
     if(_base_path.at(_base_path.size() - 1) != PATH_DELIM) {
         char delim[] = { PATH_DELIM, '\0' };
         _base_path.append(delim);
