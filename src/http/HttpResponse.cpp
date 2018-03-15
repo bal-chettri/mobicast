@@ -107,13 +107,15 @@ int Response::WriteString(const char *sz)
 }
 
 int Response::WriteChunk(const char *data, size_t len)
-{
-    // Write chunk header + end header(CRLF)
+{    
+    // Write chunk header length + CRLF
     char buff[512];
     sprintf(buff, "%X\r\n", (int)len);
-    WriteString(buff);
 
     int r;
+    if((r = WriteString(buff)) != 0) {
+        return r;
+    }
     
     // If available, write chunk data.
     if(len) {
