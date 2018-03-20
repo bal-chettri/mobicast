@@ -1,0 +1,182 @@
+/*
+ * Copyright (C) 2018  Bal Chettri
+ * Licensed under GNU GPL(https://www.gnu.org/licenses/gpl.html)
+ */
+import "oaidl.idl";
+import "ocidl.idl";
+
+// LIBMobiCast COM library
+[uuid(E79E7D4D-51EE-47D8-9A5B-62E727BF48AB), version(1.0), helpstring ("MobiCast COM library")]
+library LIBMobiCast
+{
+    importlib("stdole2.tlb");
+
+    // _PluginMeta COM interface
+    [object, uuid(9C3EF127-4036-49D6-83EF-1A1FA67FF135), dual, oleautomation, hidden, nonextensible]    
+    interface _PluginMeta : IDispatch
+    {
+        [propget] HRESULT id([out, retval] BSTR *pRetVal);    
+        [propget] HRESULT title([out, retval] BSTR *pRetVal);
+        [propget] HRESULT description([out, retval] BSTR *pRetVal);
+        [propget] HRESULT author([out, retval] BSTR *pRetVal);
+        [propget] HRESULT version([out, retval] BSTR *pRetVal);
+        [propget] HRESULT player([out, retval] BSTR *pRetVal);
+        [propget] HRESULT main([out, retval] BSTR *pRetVal);
+        [propget] HRESULT capabilities([out, retval] int *pRetVal);
+        [propget] HRESULT enabled([out, retval] VARIANT_BOOL *pRetVal);
+    }
+
+    // _Db COM interface
+    [object, uuid(EEE98548-6A48-4DD7-B5B8-3EF130D46338), dual, oleautomation, hidden, nonextensible]
+    interface _Db : IDispatch
+    {
+        HRESULT open();
+        HRESULT close();
+
+        HRESULT getProp([in] BSTR key, [out, retval] VARIANT *pValue);
+        HRESULT setProp([in] BSTR key, [in] VARIANT value);                
+    }
+
+    // _Storage COM interface
+    [helpstring("_Storage interface")]
+    [object, uuid(883993F0-602F-437B-B783-54559AF587DC), dual,oleautomation, hidden, nonextensible]
+    interface _Storage : IDispatch
+    {
+        [propget] HRESULT mounted([out, retval] VARIANT_BOOL *pRetVal);
+        [propget] HRESULT path([out, retval] BSTR *pRetVal);
+
+        HRESULT getVolumes([out, retval] VARIANT *pValue);        
+        HRESULT mount([in] BSTR path, [out, retval] VARIANT_BOOL *pRetVal);
+        HRESULT unmount([out, retval] VARIANT_BOOL *pRetVal);
+    }
+
+    // _Engine COM interface
+    [object, uuid(E162702A-B0D4-4927-8D61-8D782E122EE1), dual, oleautomation, hidden, nonextensible]
+    interface _Engine : IDispatch
+    {
+        [propget] HRESULT version([out, retval] BSTR *pRetVal);
+        [propget] HRESULT debug([out, retval] VARIANT_BOOL *pRetVal);
+        [propget] HRESULT serviceToken([out, retval] BSTR *pRetVal);
+        [propget] HRESULT pluginCount([out, retval] int *pRetVal);
+
+        HRESULT getPluginMeta([in] int index, [out, retval] _PluginMeta **ppRetVal);
+        HRESULT getServices([out, retval] VARIANT *pRetVal);
+        HRESULT log([in] BSTR msg);
+    }
+
+    ////////////////////////////////////////// MEDIA //////////////////////////////////////////////
+    //
+    // _Media COM interface
+    [object, uuid(2E8233CB-AB48-4E3B-B656-12435636E757), dual, oleautomation, hidden, nonextensible]
+    interface _Media : IDispatch
+    {
+        [propget] HRESULT type([out, retval] BSTR *pRetVal);
+        [propput] HRESULT type([in] BSTR type);
+
+        [propget] HRESULT title([out, retval] BSTR *pRetVal);
+        
+        [propget] HRESULT mediaUrl([out, retval] BSTR *pRetVal);
+        [propput] HRESULT mediaUrl([in] BSTR url);
+
+        [propget] HRESULT thumbnailUrl([out, retval] BSTR *pRetVal);
+        [propput] HRESULT thumbnailUrl([in] BSTR url);
+
+        [propget] HRESULT duration([out, retval] BSTR *pRetVal);
+
+        [propget] HRESULT format([out, retval] BSTR *pRetVal);
+        [propput] HRESULT format([in] BSTR format);
+    };
+
+    // _MediaFilter COM interface
+    [object, uuid(6E252DE7-ABD1-4225-8749-964FFC329161), dual, oleautomation, hidden, nonextensible]
+    interface _MediaFilter : IDispatch
+    {
+        [propget] HRESULT size([out, retval] int *pRetVal);
+        [propget] HRESULT dateRange([out, retval] BSTR *pRetVal);
+        [propget] HRESULT subtitles([out, retval] VARIANT_BOOL *pRetVal);
+        [propget] HRESULT type([out, retval] BSTR *pRetVal);
+        [propget] HRESULT quality([out, retval] BSTR *pRetVal);
+        [propget] HRESULT max([out, retval] int *pRetVal);
+    };    
+    
+    // _MediaSearch COM interface
+    [object, uuid(DD608A57-8AB2-44C4-8100-6E854BA7ADDD), dual, oleautomation, hidden, nonextensible]
+    interface _MediaSearch : IDispatch
+    {
+        [propget] HRESULT id([out, retval] BSTR *pRetVal);
+        [propget] HRESULT mediaSource([out, retval] BSTR *pRetVal);
+        [propget] HRESULT keywords([out, retval] BSTR *pRetVal);
+        [propget] HRESULT filter([out, retval] _MediaFilter **pRetVal);
+    };
+
+    // _Channel COM interface
+    [object, uuid(9A5BD4D0-E196-47E9-B393-A623E30A28C3), dual, oleautomation, hidden, nonextensible]
+    interface _Channel : IDispatch
+    {
+        [propget] HRESULT id([out, retval] BSTR *pRetVal);
+        [propget] HRESULT title([out, retval] BSTR *pRetVal);
+        [propget] HRESULT searches([out, retval] VARIANT *pRetVal);
+    };
+
+    // _MediaManager COM interface
+    [object, uuid(A80BFE21-51AB-40BA-B63E-5700FCB81AD1), dual, oleautomation, hidden, nonextensible]
+    interface _MediaManager : IDispatch
+    {
+        HRESULT getChannel([in] BSTR channelId, [out, retval] _Channel **ppRetVal);
+        HRESULT getChannels([out, retval] VARIANT *pRetVal);
+
+        HRESULT createSearchFilter([in] int size, [in] BSTR dateRange, [in] VARIANT_BOOL subtitles,
+                                   [in] BSTR type, [in] BSTR quality, [in] int max,
+                                   [out, retval] _MediaFilter **ppRetVal);
+        
+        HRESULT createSearch([in] BSTR mediaSource, [in] BSTR keywords, [in] IDispatch *pFilter,
+                             [out, retval] _MediaSearch **ppRetVal);
+
+        HRESULT addChannel([in] BSTR title, [in] VARIANT searches, [out, retval] BSTR *pRetVal);
+
+        HRESULT listChannel([in] BSTR channelId, [out, retval] VARIANT *pRetVal);
+
+        HRESULT registerMediaHandler([in] BSTR format, [in] BSTR pluginId);
+        HRESULT listMediaHandlers([out, retval] VARIANT *pRetVal);
+    }
+    //
+    ////////////////////////////////////////// MEDIA //////////////////////////////////////////////
+   
+    
+    /////////////////////////////////////////// HTTP //////////////////////////////////////////////
+    //
+    interface _HttpResponse;
+
+    // _HttpRequest COM interface
+    [object, uuid(E0B606D9-F2C7-453B-B608-5FE65F731A9D), dual, oleautomation, hidden, nonextensible]
+    interface _HttpRequest : IDispatch
+    {
+        [propget] HRESULT method([out, retval] BSTR *pRetVal);
+        [propget] HRESULT uri([out, retval] BSTR *pRetVal);
+        [propget] HRESULT host([out, retval] BSTR *pRetVal);
+        [propget] HRESULT resource([out, retval] BSTR *pRetVal);
+        [propget] HRESULT rawQueryString([out, retval] BSTR *pRetVal);        
+        [propget] HRESULT contentLength([out, retval] long *pRetVal);
+        [propget] HRESULT body([out, retval] BSTR *pRetVal);
+        [propget] HRESULT response([out, retval] _HttpResponse **ppResponse);
+
+        HRESULT getHeader([in] BSTR name, [out, retval] BSTR *pRetVal);
+        HRESULT reply([in]int statusCode, [out, retval] int *pRetCode);
+        HRESULT replyText([in]int statusCode, [in] BSTR text, [optional, in] VARIANT contentType, [out, retval] int *pRetCode);
+        HRESULT sendFile([in]BSTR path, [optional, in] VARIANT contentType, [out, retval] int *pRetVal);
+    }
+
+    // _HttpResponse COM interface
+    [object, uuid(63D4906B-9E55-4076-A758-3AB8F8FF16B2), dual, oleautomation, hidden, nonextensible]
+    interface _HttpResponse : IDispatch
+    {
+        HRESULT setStatus([in] int status, [in] BSTR msg);
+        HRESULT setHeader([in] BSTR name, [in] BSTR value);
+        HRESULT setContentLength([in] long length);
+        HRESULT writeHeaders([out, retval] int *pRetVal);
+        HRESULT writeString([in] BSTR text, [out, retval] int *pRetVal);
+        HRESULT end([out, retval] int *pRetVal);
+    }
+    //
+    /////////////////////////////////////////// HTTP //////////////////////////////////////////////
+}
