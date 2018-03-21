@@ -80,14 +80,11 @@ public:
     {
         ULONG refcount = --m_ref_count;
 
-        // Decrement the reference count and check if it reached 0
         if(refcount == 0)
         {
-            // No references to this object now so delete this object from heap
             delete this;
 
-            // Decrement the object count.
-            ::InterlockedDecrement((LONG *)&_comObjCount);
+            InterlockedDecrement((LONG *)&_comObjCount);
         }
 
         return refcount;
@@ -413,9 +410,9 @@ public:
     virtual HRESULT STDMETHODCALLTYPE LockServer(BOOL fLock)
     {
         if(fLock) {
-            InterlockedIncrement(static_cast<LONG *>(&_comLockCount));
+            InterlockedIncrement((LONG *)&_comLockCount);
         } else {
-            InterlockedDecrement(static_cast<LONG *>(&_comLockCount));
+            InterlockedDecrement((LONG *)&_comLockCount);
         }
 
         return NOERROR;
