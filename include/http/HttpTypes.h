@@ -22,7 +22,7 @@
 #   define HTTP_PLATFORM_MAC
 #endif
 
-// Include Windows.h if requried.
+// Include Windows.h if required.
 #ifdef HTTP_PLATFORM_WIN
 #   define WIN32_LEAN_AND_MEAN
 #   define _CRT_SECURE_NO_WARNINGS
