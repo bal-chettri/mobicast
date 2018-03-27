@@ -85,7 +85,7 @@ public:
     /** Returns the list of collected texts. */
     inline const std::list<std::string> &GetTexts() const { return _texts; }
 
-    /** Resets for state for a repeat match. */
+    /** Resets the state for a new match without clearing the collected data. */
     void Reset();
 
     /** Clears the entire state and collected data. */
