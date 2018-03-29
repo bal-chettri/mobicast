@@ -38,6 +38,7 @@ static void ExecServiceBlock(void *pParam)
     }
 
     pHttpResponse->Release();
+    pHttpRequest->Release();
 }
 
 void JssHttpHandler::InvokeJssService(http::Request *req, const char *srvcPath)
