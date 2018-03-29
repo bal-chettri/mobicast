@@ -38,7 +38,7 @@ int JssHttpHandler::HandleGetPost(http::Request *req, http::Service *srvc)
     } else {
         ptrRes++;
     }
-    
+
     std::string strFilePath;
     if(!vhost.GetVirtualDirectory().Resolve(ptrRes, strFilePath)) {
         return req->Reply(http::kStatusForbidden, NULL);
@@ -46,8 +46,12 @@ int JssHttpHandler::HandleGetPost(http::Request *req, http::Service *srvc)
 
     const char *access_token = req->GetHeader("access-token");
     if(access_token && !strcmp(access_token, g_serviceAccessToken))
-    {        
-        return req->SendFile(strFilePath.c_str(), srvc->GetFileMimeType("jss"));
+    {
+        if(req->GetMethod() == "GET") {
+            return req->SendFile(strFilePath.c_str(), srvc->GetFileMimeType("jss"));
+        } else {
+            return kNotHandled;
+        }
     }
     else
     {
