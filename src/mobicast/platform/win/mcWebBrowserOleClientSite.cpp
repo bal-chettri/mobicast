@@ -33,14 +33,14 @@ HRESULT STDMETHODCALLTYPE WebBrowserOleClientSite::SaveObject(void)
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE WebBrowserOleClientSite::GetMoniker(DWORD dwAssign, DWORD dwWhichMoniker, __RPC__deref_out_opt IMoniker **ppmk)
+HRESULT STDMETHODCALLTYPE WebBrowserOleClientSite::GetMoniker(DWORD dwAssign, DWORD dwWhichMoniker, IMoniker **ppmk)
 {
     // MC_LOG_DEBUG("WebBrowserOleClientSite::GetMoniker called.");
     *ppmk = NULL;
     return E_NOTIMPL;
 }
 
-HRESULT STDMETHODCALLTYPE WebBrowserOleClientSite::GetContainer(__RPC__deref_out_opt IOleContainer **ppContainer)
+HRESULT STDMETHODCALLTYPE WebBrowserOleClientSite::GetContainer(IOleContainer **ppContainer)
 {
     // MC_LOG_DEBUG("WebBrowserOleClientSite::GetContainer called.");
     *ppContainer = NULL;
