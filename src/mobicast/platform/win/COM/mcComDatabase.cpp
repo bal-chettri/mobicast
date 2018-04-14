@@ -4,7 +4,6 @@
  */
 #include "stdafx.h"
 #include <mobicast/platform/win/COM/mcComDatabase.h>
-#include <mobicast/platform/win/COM/mcComMedia.h>
 #include <mobicast/platform/win/COM/mcComUtils.h>
 #include <mobicast/mcDebug.h>
 
