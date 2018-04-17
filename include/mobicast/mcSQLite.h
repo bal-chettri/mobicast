@@ -21,7 +21,7 @@ namespace MobiCast
 class SQLiteExec
 {
 public:
-    struct NullBinder
+    struct NullBinder_t
     {
         int operator() (sqlite3_stmt *)
         {
@@ -29,13 +29,25 @@ public:
         }
     };
 
-    struct NullReader
+    struct NullReader_t
     {
         int operator() (sqlite3_stmt *, int, const void *)
         {
             return SQLITE_OK;
         }
     };
+
+    static NullBinder_t &NullBinder()
+    {
+        static NullBinder_t binder;
+        return binder;
+    }
+
+    static NullReader_t &NullReader()
+    {
+        static NullReader_t reader;
+        return reader;
+    }
 
     template <typename _BT, typename _RT, typename _CT>
     SQLiteExec(sqlite3 *db, const char *sql, _BT &binder, _RT &reader, _CT context) :
@@ -92,7 +104,7 @@ public:
 private:
     void GetError(sqlite3 *db)
     {
-        int nErrMsg = strlen(sqlite3_errmsg(db)) + 1;
+        size_t nErrMsg = strlen(sqlite3_errmsg(db)) + 1;
         _errmsg = (char *)malloc(nErrMsg);
         if(_errmsg){
             memcpy(_errmsg, sqlite3_errmsg(db), nErrMsg);

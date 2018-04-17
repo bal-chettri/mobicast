@@ -94,7 +94,7 @@ void Database::GetProperty(const char *key, TypedValue& value)
             SQLITE_BIND_CHECK(sqlite3_bind_text(stmt, 1, key, -1, SQLITE_STATIC))
             return SQLITE_OK;
         }
-    };
+    }binder(key);
 
     struct Reader
     {
@@ -104,9 +104,9 @@ void Database::GetProperty(const char *key, TypedValue& value)
             value->value = (const char *)sqlite3_column_text(stmt, 1);
             return SQLITE_OK;
         }
-    };
+    }reader;
 
-    SQLiteExec sqlExec(_db, kSqlGetProperty, Binder(key), Reader(), &value);
+    SQLiteExec sqlExec(_db, kSqlGetProperty, binder, reader, &value);
 }
 
 void Database::GetAllProperties(std::map<std::string, TypedValue> &values)
@@ -124,18 +124,18 @@ void Database::GetAllProperties(std::map<std::string, TypedValue> &values)
             values->insert(std::pair<std::string, Database::TypedValue>(name, value));
             return SQLITE_OK;
         }
-    };
+    }reader;
 
-    SQLiteExec sqlExec(_db, kSqlGetAllProperties, SQLiteExec::NullBinder(), Reader(), &values);
+    SQLiteExec sqlExec(_db, kSqlGetAllProperties, SQLiteExec::NullBinder(), reader, &values);
 }
 
 bool Database::DeleteProperty(const char *key)
 {
-    struct DeleteBinder
+    struct Binder
     {
         const char *key;
 
-        DeleteBinder(const char *key_) : key(key_) { }
+        Binder(const char *key_) : key(key_) { }
 
         int operator() (sqlite3_stmt *stmt)
         {
@@ -143,9 +143,9 @@ bool Database::DeleteProperty(const char *key)
             SQLITE_BIND_CHECK(sqlite3_bind_text(stmt, 1, key, -1, SQLITE_STATIC))
             return SQLITE_OK;
         }
-    };
+    }binder(key);
 
-    SQLiteExec sqlExecDelete(_db, kSqlDeleteProperty, DeleteBinder(key), SQLiteExec::NullReader(), nullptr);
+    SQLiteExec sqlExecDelete(_db, kSqlDeleteProperty, binder, SQLiteExec::NullReader(), nullptr);
     return sqlExecDelete.ErrorCode() == SQLITE_OK;
 }
 
@@ -156,13 +156,13 @@ bool Database::SetProperty(const char *key, const char *value, ValueType type)
         return false;
     }
 
-    struct InsertBinder
+    struct Binder
     {
         const char *key;
         const char *value;
         ValueType type;
 
-        InsertBinder(const char *key_, const char *value_, ValueType type_) :
+        Binder(const char *key_, const char *value_, ValueType type_) :
             key(key_), value(value_), type(type_)
         { }
 
@@ -174,9 +174,9 @@ bool Database::SetProperty(const char *key, const char *value, ValueType type)
             SQLITE_BIND_CHECK(sqlite3_bind_text(stmt, 3, value, -1, SQLITE_STATIC))
             return SQLITE_OK;
         }
-    };
+    }binder(key, value, type);
 
-    SQLiteExec sqlExecInsert(_db, kSqlSetProperty, InsertBinder(key, value, type), SQLiteExec::NullReader(), nullptr);
+    SQLiteExec sqlExecInsert(_db, kSqlSetProperty, binder, SQLiteExec::NullReader(), nullptr);
     return sqlExecInsert.ErrorCode() == SQLITE_OK;
 }
 
@@ -194,7 +194,7 @@ void Database::GetChannel(rowid_t id, RowCallback callback, void *context)
             SQLITE_BIND_CHECK(sqlite3_bind_int64(stmt, 1, channelId))
             return SQLITE_OK;
         }
-    };
+    }binder(id);
 
     struct Reader
     {
@@ -210,9 +210,9 @@ void Database::GetChannel(rowid_t id, RowCallback callback, void *context)
             callback(&row, context);
             return SQLITE_OK;
         }
-    };
+    }reader(context);
 
-    SQLiteExec sqlExec(_db, kSqlGetChannel, Binder(id), Reader(context), callback);
+    SQLiteExec sqlExec(_db, kSqlGetChannel, binder, reader, callback);
 }
 
 void Database::GetChannelSearches(rowid_t channelId, RowCallback callback, void *context)
@@ -229,7 +229,7 @@ void Database::GetChannelSearches(rowid_t channelId, RowCallback callback, void 
             SQLITE_BIND_CHECK(sqlite3_bind_int64(stmt, 1, channelId))
             return rc;
         }
-    };
+    }binder(channelId);
 
     struct Reader
     {
@@ -247,9 +247,9 @@ void Database::GetChannelSearches(rowid_t channelId, RowCallback callback, void 
             callback(&row, context);
             return SQLITE_OK;
         }
-    };
+    }reader(context);
 
-    SQLiteExec sqlExec(_db, kSqlGetChannelSearches, Binder(channelId), Reader(context), callback);
+    SQLiteExec sqlExec(_db, kSqlGetChannelSearches, binder, reader, callback);
 }
 
 void Database::GetChannels(RowCallback callback, void *context)
@@ -268,9 +268,9 @@ void Database::GetChannels(RowCallback callback, void *context)
             callback(&row, context);
             return SQLITE_OK;
         }
-    };
+    }reader(context);
 
-    SQLiteExec sqlExec(_db, kSqlGetChannels, SQLiteExec::NullBinder(), Reader(context), callback);
+    SQLiteExec sqlExec(_db, kSqlGetChannels, SQLiteExec::NullBinder(), reader, callback);
 }
 
 rowid_t Database::AddSearch(const char *source, const char *keywords, const char *filters)
@@ -293,9 +293,9 @@ rowid_t Database::AddSearch(const char *source, const char *keywords, const char
             SQLITE_BIND_CHECK(sqlite3_bind_text(stmt, 3, filters, -1, SQLITE_STATIC))
             return SQLITE_OK;
         }
-    };
+    }binder(source, keywords, filters);
 
-    SQLiteExec sqlExec(_db, kSqlAddSearch, Binder(source, keywords, filters), SQLiteExec::NullReader(), nullptr);
+    SQLiteExec sqlExec(_db, kSqlAddSearch, binder, SQLiteExec::NullReader(), nullptr);
 
     if(sqlExec.ErrorCode() == SQLITE_OK) {
         return sqlite3_last_insert_rowid(_db);
@@ -318,9 +318,9 @@ rowid_t Database::AddChannel(const char *title)
             SQLITE_BIND_CHECK(sqlite3_bind_text(stmt, 1, title, -1, SQLITE_STATIC))
             return SQLITE_OK;
         }
-    };
+    }binder(title);
 
-    SQLiteExec sqlExec(_db, kSqlAddChannel, Binder(title), SQLiteExec::NullReader(), nullptr);
+    SQLiteExec sqlExec(_db, kSqlAddChannel, binder, SQLiteExec::NullReader(), nullptr);
 
     if(sqlExec.ErrorCode() == SQLITE_OK) {
         return sqlite3_last_insert_rowid(_db);
@@ -346,9 +346,9 @@ rowid_t Database::AddChannelSearch(rowid_t channelId, rowid_t searchId)
             SQLITE_BIND_CHECK(sqlite3_bind_int64(stmt, 1, searchId))
             return SQLITE_OK;
         }
-    };
+    }binder(channelId, searchId);
 
-    SQLiteExec sqlExec(_db, kSqlAddChannelSearch, Binder(channelId, searchId), SQLiteExec::NullReader(), nullptr);
+    SQLiteExec sqlExec(_db, kSqlAddChannelSearch, binder, SQLiteExec::NullReader(), nullptr);
 
     if(sqlExec.ErrorCode() == SQLITE_OK) {
         return sqlite3_last_insert_rowid(_db);
