@@ -40,6 +40,6 @@ const char* const kSqlAddChannel =
 "INSERT INTO CHANNELS (Title) VALUES(?1);";
 
 const char* const kSqlAddChannelSearch =
-"INSERT INTO SEARCHES (ChannelId, SearchId) VALUES(?1, ?2);";
+"INSERT INTO CHANNEL_SEARCHES (ChannelId, SearchId) VALUES(?1, ?2);";
 
 } // MobiCast namespace
