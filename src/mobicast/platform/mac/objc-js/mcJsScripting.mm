@@ -95,8 +95,8 @@
     {
         if(!strcmp(_prop_map->name, [key UTF8String])) {
             if(_prop_map->setter_sel != NULL) {
-                IMP imp = [self methodForSelector:_prop_map->getter_sel];
-                ((void(*)(id,SEL))imp)(self, _prop_map->getter_sel);
+                IMP imp = [self methodForSelector:_prop_map->setter_sel];
+                ((void(*)(id,SEL,id))imp)(self, _prop_map->setter_sel, value);
                 return;
             }
             break;
