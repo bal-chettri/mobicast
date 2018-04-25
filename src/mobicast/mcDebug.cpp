@@ -41,23 +41,24 @@ void Log(const char *module, const char *format, ...)
         va_end(valist);
         
         // If a message starts with a back quote(`), do not add a line break.
-        bool lineBreak = *buffer != '`';
+        const char *msg = buffer;
+        bool lineBreak = *msg != '`';
         if(!lineBreak) {
-            ++buffer;
+            ++msg;
         }
         
 #ifdef MC_PLATFORM_WIN
         // Print the message to debugger console.
         OutputDebugString(module);
         OutputDebugString(": ");
-        OutputDebugString(buffer);
+        OutputDebugString(msg);
         if(lineBreak) {
             OutputDebugString("\n");
         }
 #else
-        printf(lineBreak ? "%s: %s\n" : "%s: %s", module, buffer);
+        printf(lineBreak ? "%s: %s\n" : "%s: %s", module, msg);
 #endif
-        delete [] buffer;           
+        delete [] buffer;
     }
 }
 
