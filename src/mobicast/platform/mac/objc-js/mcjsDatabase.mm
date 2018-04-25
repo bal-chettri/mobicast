@@ -5,8 +5,6 @@
 #include <mobicast/platform/mac/objc-js/mcJsDatabase.h>
 #include <mobicast/mcDebug.h>
 
-#import <JavaScriptCore/JavaScriptCore.h>
-
 static NSObject *WrapValue(const MobiCast::Database::TypedValue &tvalue);
 static bool UnwrapValue(NSObject *var, MobiCast::Database::TypedValue &tvalue);
 
