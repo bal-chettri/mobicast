@@ -88,7 +88,7 @@ public:
 
     ~SQLiteExec()
     {
-        MC_ASSERTE(_rc == SQLITE_OK, "Failed to execute SQL: %s. Error: %s", _sql, _errmsg);
+        MC_ASSERTE(_rc == SQLITE_OK, "Failed to execute SQL: %s. Error: %s", _sql, _errmsg ? _errmsg : "?");
 
         if(_stmt) {
             sqlite3_finalize(_stmt);
@@ -108,8 +108,6 @@ private:
         _errmsg = (char *)malloc(nErrMsg);
         if(_errmsg){
             memcpy(_errmsg, sqlite3_errmsg(db), nErrMsg);
-        } else {
-            *_errmsg = 0;
         }
     }
 
