@@ -19,6 +19,11 @@
       }
     </script>
   </ul>
+  <script>
+  if(drives.length == 0) {
+    MC.write('<p>No usable drives found. If you have an external drive, insert it and retry. For more information go to Help screen on your smartphone app.</p>');
+  }
+  </script>
   <br />
   <input type="button" value="NEXT" onclick="onSaveDriveSettings();" />    
 </div>
