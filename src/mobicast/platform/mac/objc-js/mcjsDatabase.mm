@@ -3,6 +3,7 @@
  * Licensed under GNU GPL(https://www.gnu.org/licenses/gpl.html)
  */
 #include <mobicast/platform/mac/objc-js/mcJsDatabase.h>
+#include <mobicast/platform/mac/mcObjCExt.h>
 #include <mobicast/mcDebug.h>
 
 static NSObject *WrapValue(const MobiCast::Database::TypedValue &tvalue);
@@ -127,7 +128,7 @@ static bool UnwrapValue(NSObject *var, MobiCast::Database::TypedValue &tvalue)
         NSNumber *num = (NSNumber *)var;
         char szVal[50];
 
-        if(!strcmp([num objCType], @encode(BOOL)))
+        if([num isBoolValue])
         {
             sprintf(szVal, "%s", [num boolValue] == YES ? "True" : "False");
             tvalue.value = szVal;
