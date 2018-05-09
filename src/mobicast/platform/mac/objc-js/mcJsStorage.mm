@@ -54,32 +54,34 @@
 {
     NSFileManager *fm = [NSFileManager defaultManager];
     NSArray<NSURL *> *vols = [fm mountedVolumeURLsIncludingResourceValuesForKeys:nil options:NSVolumeEnumerationSkipHiddenVolumes];
+    NSMutableArray *arr = [NSMutableArray arrayWithCapacity:[vols count] + 1];
     
-    if(vols == nil || [vols count] == 0) {
-        return [NSArray array];
-    } else {
-        NSMutableArray *arr = [NSMutableArray arrayWithCapacity:[vols count]];
-        for(NSURL *urlPath in vols) {
-            // Query properties of the volume.
-            NSNumber *isReadOnly;
-            NSNumber *isRootFileSystem;
+    // Add user's home directory as a default storage volume. This requires Sandboxing to be disabled.
+    NSString *volumeInfo = [NSString stringWithFormat:@"USER_HOME,%@", NSHomeDirectory()];
+    [arr addObject:volumeInfo];
+    
+    // Add current system mounted volumes.
+    for(NSURL *urlPath in vols) {
+        // Query properties of the volume.
+        NSNumber *isReadOnly;
+        NSNumber *isRootFileSystem;
 
-            [urlPath getResourceValue:&isReadOnly forKey:NSURLVolumeIsReadOnlyKey error:nil];
-            [urlPath getResourceValue:&isRootFileSystem forKey:NSURLVolumeIsRootFileSystemKey error:nil];
+        [urlPath getResourceValue:&isReadOnly forKey:NSURLVolumeIsReadOnlyKey error:nil];
+        [urlPath getResourceValue:&isRootFileSystem forKey:NSURLVolumeIsRootFileSystemKey error:nil];
 
-            // Skip read-only and root file system volumes.
-            if([isReadOnly boolValue] == NO && [isRootFileSystem boolValue] == NO)
-            {
-                NSString *volumeName;
-                [urlPath getResourceValue:&volumeName forKey:NSURLVolumeNameKey error:nil];
+        // Skip read-only and root file system volumes.
+        if([isReadOnly boolValue] == NO && [isRootFileSystem boolValue] == NO)
+        {
+            NSString *volumeName;
+            [urlPath getResourceValue:&volumeName forKey:NSURLVolumeNameKey error:nil];
 
-                // Volume info is comma delimted pair of volume name and path.
-                NSString *volumeInfo = [NSString stringWithFormat:@"%@,%@", volumeName, [urlPath path]];
-                [arr addObject:volumeInfo];
-            }
+            // Volume info is comma delimted pair of volume name and path.
+            volumeInfo = [NSString stringWithFormat:@"%@,%@", volumeName, [urlPath path]];
+            [arr addObject:volumeInfo];
         }
-        return arr;
     }
+    
+    return arr;
 }
 
 - (BOOL)mount:(NSString *)root
