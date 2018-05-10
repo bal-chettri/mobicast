@@ -64,7 +64,7 @@ static void *_StartHttpService(void *param)
 {
     http::Service *pService = reinterpret_cast<http::Service *>(param);
     if(pService->Run() != 0) {
-        MC_LOGD("Failed to run http server.");
+        MC_LOGE("Failed to run http server.");
         return (void *)-1;
     }
     return (void *)0;
@@ -85,21 +85,32 @@ static void *_StartHttpService(void *param)
     [self.webview loadURL:url];
 }
 
-// Installs database to current working directory.
+// Setups basic workspace.
+- (BOOL)setupWorkspace
+{
+    // Create "mobicast" directory under User's home directory.
+    NSString *dirPath = [NSString pathWithComponents:@[NSHomeDirectory(), @"mobicast"]];
+    if(![[NSFileManager defaultManager] createDirectoryAtPath:dirPath withIntermediateDirectories:YES attributes:nil error:nil])
+    {
+        MC_LOGE("Failed to create directory '%s'.", [dirPath UTF8String]);
+        return NO;
+    }
+    return YES;
+}
+
+// Installs database to {HomeDir}/mobicast directory.
 - (BOOL)installDb
 {
     NSString *dbSrcPath = [[NSBundle mainBundle] pathForResource:@"mobicast" ofType:@"db"];
-    NSString *curDirPath = [[NSFileManager defaultManager] currentDirectoryPath];
-    NSString *dbDstPath = [curDirPath stringByAppendingPathComponent:@"mobicast.db"];
+    NSString *dbDstPath = [NSString pathWithComponents:@[NSHomeDirectory(), @"mobicast", @"mobicast.db"]];
     BOOL isDir = NO;
     if(![[NSFileManager defaultManager] fileExistsAtPath:dbDstPath isDirectory:&isDir])
     {
-        if([[NSFileManager defaultManager] copyItemAtPath:dbSrcPath toPath:dbDstPath error:nil])
+        if(![[NSFileManager defaultManager] copyItemAtPath:dbSrcPath toPath:dbDstPath error:nil])
         {
-            return YES;
+            MC_LOGE("Failed to copy database.");
+            return NO;
         }
-        MC_LOGD("Failed to copy database.");
-        return NO;
     }
     return YES;
 }
@@ -113,7 +124,8 @@ static void *_StartHttpService(void *param)
     // Get path of the 'res' folder in the application's main bundle.
     NSString *strResPath = [[NSBundle mainBundle] pathForResource:@"res" ofType:@""];
     
-    if([self installDb])
+    // Setup workspace and install db if required.
+    if([self setupWorkspace] && [self installDb])
     {
         // Get document root for virtual directory.
         NSString *docRoot = [strResPath stringByAppendingPathComponent:@"web"];

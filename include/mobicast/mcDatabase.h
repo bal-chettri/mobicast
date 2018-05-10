@@ -40,7 +40,7 @@ public:
 
     struct DbRow
     {
-        int __unused;
+        int __unused__;
     };
 
     struct ChannelRow : public DbRow
@@ -64,7 +64,7 @@ public:
     ~Database();
 
     /** Opens database. */
-    void Open();
+    void Open(const char *dirpath);
 
     /** Closes database. */
     void Close();

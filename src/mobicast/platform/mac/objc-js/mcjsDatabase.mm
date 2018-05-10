@@ -27,7 +27,8 @@ static bool UnwrapValue(NSObject *var, MobiCast::Database::TypedValue &tvalue);
 
 - (void)open
 {
-    _db->Open();
+    NSString *dirPath = [NSString pathWithComponents:@[NSHomeDirectory(), @"mobicast"]];
+    _db->Open([dirPath UTF8String]);
 }
 
 - (void)close

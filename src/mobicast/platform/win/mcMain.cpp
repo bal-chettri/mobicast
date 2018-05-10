@@ -22,6 +22,8 @@
 #include <Windows.h>
 #include <commctrl.h>
 #include <tchar.h>
+#include <ShlObj.h>
+#include <Shlwapi.h>
 
 // Port for MobiCast http web service.
 #define PORT            8080
@@ -80,7 +82,7 @@ static DWORD WINAPI _StartHttpService(void *param)
     http::Service *pService = reinterpret_cast<http::Service *>(param);
     if(pService->Run())
     {
-        MC_LOGD("Failed to run http server.");
+        MC_LOGE("Failed to run http server.");
         return -1;
     }
     return 0;
@@ -102,6 +104,67 @@ static void CALLBACK LoadIndexPage(HWND hWnd, UINT, UINT_PTR timerId, DWORD)
 
     MC_LOGD("Loading index page %s", szUrl);
     g_window->GetBrowser()->Load(szUrl);
+}
+
+// Returns workspace directory path.
+static bool GetWorkspaceDirectory(std::string &strDirPath)
+{
+    strDirPath.clear();
+
+    PWSTR pwszPath;
+    HRESULT hr = SHGetKnownFolderPath(FOLDERID_ProgramData, 0, NULL, &pwszPath);
+    if(FAILED(hr))
+    {
+        MC_LOGE("Failed to get ProgramData directory path.");
+        return false;
+    }
+
+    size_t size = wcstombs(NULL, pwszPath, 0) + 1;
+
+    char *szDirPath = new char[size + 1];
+    wcstombs(szDirPath, pwszPath, size);
+    CoTaskMemFree(pwszPath);
+
+    strDirPath.assign(szDirPath);
+    delete [] szDirPath;
+
+    MobiCast::PathUtils::AppendPathComponent(strDirPath, "mobicast");
+    return true;
+}
+
+// Setups basic workspace.
+static bool SetupWorkspace()
+{
+    std::string strDirPath;
+    if(!GetWorkspaceDirectory(strDirPath)) {
+        return false;
+    }
+    if(CreateDirectory(strDirPath.c_str(), NULL) == FALSE &&
+        GetLastError() != ERROR_ALREADY_EXISTS)
+    {
+        MC_LOGE("Failed to create directory '%s'.", strDirPath.c_str());
+        return false;
+    }
+    return true;
+}
+
+// Installs database to workspace directory.
+static bool InstallDb()
+{
+    std::string strDbPath;
+    if(!GetWorkspaceDirectory(strDbPath)) {
+        return false;
+    }
+
+    MobiCast::PathUtils::AppendPathComponent(strDbPath, "mobicast.db");
+    if(!PathFileExistsA(strDbPath.c_str()))
+    {
+        if(CopyFileA("mobicast.db", strDbPath.c_str(), TRUE) == FALSE) {
+            MC_LOGE("Failed to copy database.");
+            return false;
+        }
+    }
+    return true;
 }
 
 // WebBrowser event handler.
@@ -143,7 +206,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, int)
     HRESULT hr = OleInitialize(NULL);
     if(FAILED(hr))
     {
-        MC_LOGD("OleInitialize() failed.");
+        MC_LOGE("OleInitialize() failed.");
+        return -1;
+    }
+
+    if(!SetupWorkspace() || !InstallDb())
+    {
+        OleUninitialize();
         return -1;
     }
 
@@ -152,7 +221,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, int)
     int wsaRet = WSAStartup(MAKEWORD(1, 1), &wsadata);
     if (wsaRet != 0)
     {
-        MC_LOGD("WSAStartup failed\n");
+        MC_LOGE("WSAStartup failed\n");
         return -1;
     }
 
@@ -244,7 +313,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, int)
     HANDLE hWebSrvcThread = CreateThread(NULL, 0, _StartHttpService, g_httpService, CREATE_SUSPENDED, NULL);
     if(hWebSrvcThread == NULL)
     {
-        MC_LOGD("Failed to create http service thread.");
+        MC_LOGE("Failed to create http service thread.");
         WSACleanup();
         return -1;
     }

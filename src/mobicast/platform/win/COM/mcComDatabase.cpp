@@ -6,6 +6,8 @@
 #include <mobicast/platform/win/COM/mcComDatabase.h>
 #include <mobicast/platform/win/COM/mcComUtils.h>
 #include <mobicast/mcDebug.h>
+#include <mobicast/mcPathUtils.h>
+#include <ShlObj.h>
 
 namespace MobiCast
 {
@@ -27,8 +29,23 @@ CDatabase::~CDatabase()
 
 STDMETHODIMP CDatabase::open()
 {
-    _db->Open();
-    return S_OK;
+    PWSTR pwszPath;
+    HRESULT hr = SHGetKnownFolderPath(FOLDERID_ProgramData, 0, NULL, &pwszPath);
+    if(SUCCEEDED(hr))
+    {
+        size_t size = wcstombs(NULL, pwszPath, 0) + 1;
+
+        char *szDirPath = new char[size + 1];
+        wcstombs(szDirPath, pwszPath, size);
+        CoTaskMemFree(pwszPath);
+
+        std::string strDirPath(szDirPath);
+        delete [] szDirPath;
+
+        PathUtils::AppendPathComponent(strDirPath, "mobicast");
+        _db->Open(strDirPath.c_str());
+    }
+    return hr;
 }
 
 STDMETHODIMP CDatabase::close()

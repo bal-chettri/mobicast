@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include <mobicast/mcDatabase.h>
 #include <mobicast/mcDatabaseSQL.h>
+#include <mobicast/mcPathUtils.h>
 
 #define MOBICAST_DB_NAME    "mobicast.db"
 #define MOBICAST_DB_VER     "1"
@@ -21,14 +22,17 @@ Database::~Database()
     Close();
 }
 
-void Database::Open()
+void Database::Open(const char *dirpath)
 {
     if(_db) {
         MC_LOGD("Database already opened.");
         return;
     }
 
-    int rc = sqlite3_open(MOBICAST_DB_NAME, &_db);
+    std::string strDbPath(dirpath);
+    strDbPath = PathUtils::AppendPathComponent(strDbPath, MOBICAST_DB_NAME);
+
+    int rc = sqlite3_open(strDbPath.c_str(), &_db);
     MC_ASSERTE(!rc, "Failed to open database: %s", sqlite3_errmsg(_db));
 
     // Verify database version.
