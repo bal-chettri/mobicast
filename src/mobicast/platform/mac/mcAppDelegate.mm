@@ -117,16 +117,16 @@ static void *_StartHttpService(void *param)
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    // Listen for MCWebView events so we can initialize the web environment when
-    // the document has been loaded.
-    self.webview.delegate = self;
-    
-    // Get path of the 'res' folder in the application's main bundle.
-    NSString *strResPath = [[NSBundle mainBundle] pathForResource:@"res" ofType:@""];
-    
     // Setup workspace and install db if required.
     if([self setupWorkspace] && [self installDb])
     {
+        // Listen for MCWebView events so we can initialize the web environment when
+        // the document has been loaded.
+        self.webview.delegate = self;
+        
+        // Get path of the 'res' folder in the application's main bundle.
+        NSString *strResPath = [[NSBundle mainBundle] pathForResource:@"res" ofType:@""];
+        
         // Get document root for virtual directory.
         NSString *docRoot = [strResPath stringByAppendingPathComponent:@"web"];
         
@@ -206,6 +206,11 @@ static void *_StartHttpService(void *param)
             // Load test page after 2 secs.
             [self performSelector:@selector(loadIndexPage) withObject:nil afterDelay:2];
         }
+        
+#ifndef MC_DEBUG
+        // Enter fullscreen mode on release build.
+        [self.window toggleFullScreen:nil];
+#endif
     }
 }
 
