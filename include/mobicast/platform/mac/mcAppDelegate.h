@@ -5,8 +5,9 @@
 #import <Cocoa/Cocoa.h>
 #import "mcWebView.h"
 
-@interface MCAppDelegate : NSObject<NSApplicationDelegate, MCWebViewDelegate>
+@interface MCAppDelegate : NSObject<NSApplicationDelegate, MCWebViewDelegate, NSNetServiceDelegate>
 {
+    NSNetService *_service;
 }
 
 @property (weak) IBOutlet NSWindow *window;

@@ -70,6 +70,30 @@ static void *_StartHttpService(void *param)
     return (void *)0;
 }
 
+// Publishes http service.
+- (void)publishWebService
+{
+    // We want to publish the service only on local domain.
+    _service = [[NSNetService alloc] initWithDomain:@"local." type:@"_http._tcp." name:@"Mobicast HTTP Service" port:PORT];
+    if(_service == nil)
+    {
+        MC_LOGE("Failed to create NSNetService object. Web service discovery will not work.");
+    }
+    else
+    {
+        [_service setDelegate:self];
+        [_service publish];
+    }
+}
+
+// Unpublishes web service.
+- (void)unpublishWebService
+{
+    [_service setDelegate:nil];
+    [_service stop];
+    _service = nil;
+}
+
 // Loads the index page in web view.
 - (void)loadIndexPage
 {
@@ -203,6 +227,9 @@ static void *_StartHttpService(void *param)
             // Run service in separate thread.
             pthread_create(&handle_http_srvc_thread, NULL, &_StartHttpService, (void *)g_httpService);
             
+            // Publish the web service enabling client applications to auto discover the service endpoint.
+            [self publishWebService];
+            
             // Load test page after 2 secs.
             [self performSelector:@selector(loadIndexPage) withObject:nil afterDelay:2];
         }
@@ -225,6 +252,8 @@ static void *_StartHttpService(void *param)
     g_httpService->SetRunning(false);
     pthread_join(handle_http_srvc_thread, NULL);
     g_httpService->Destroy();
+    
+    [self unpublishWebService];
 }
 
 #pragma mark MCWebViewDelegate
@@ -249,6 +278,19 @@ static void *_StartHttpService(void *param)
 
 - (void)mcwebView:(MCWebView *)webview didFailedToLoadURL:(NSString *)url
 {
+}
+
+#pragma mark NSNetServiceDelegate
+
+- (void)netServiceDidPublish:(NSNetService *)sender
+{
+    MC_LOGD("Mobicast HTTP Service was successfully published.");
+}
+
+- (void)netService:(NSNetService *)sender didNotPublish:(NSDictionary<NSString *,NSNumber *> *)errorDict
+{
+    NSNumber *errCode = [errorDict valueForKey:NSNetServicesErrorCode];
+    MC_LOGE("Failed to publish Mobicast HTTP Service. Error code = %d.", [errCode integerValue]);
 }
 
 @end
