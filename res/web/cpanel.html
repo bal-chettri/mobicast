@@ -12,6 +12,13 @@
     <title>MobiCast Control Panel</title>
   </head>
   <body>
+    <div id="log" style="float:right;">
+      Log:<br />
+      <input type="button" style="width:80px" value="Clear" onclick="clearLog();" />
+      <br />
+      <textarea id="output" style="width:480px; height:400px"></textarea>
+    </div>
+    
     Pair phone:<br />
     Id:&nbsp;<input type="text" id="phone_id" style="width:100px" value="0123456789" />
     &nbsp;&nbsp;
@@ -67,11 +74,6 @@
     <input type="button" style="width:80px" value="Mute" onclick="mute();" />
     <input type="button" style="width:80px" value="Unmute" onclick="unmute();" />
     <br /><br />
-    
-    Log:<br />
-    <input type="button" style="width:80px" value="Clear" onclick="clearLog();" />
-    <br />
-    <textarea id="output" style="width:480px; height:200px"></textarea>
   </body>
 </html>
 <script>
