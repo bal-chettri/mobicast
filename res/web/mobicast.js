@@ -287,6 +287,11 @@ window.onload = function() {
       if(path in MC._serviceMap) {
         return MC._serviceMap[path](_req, _resp);
       } else {
+        var result = {
+          'status': 'error',
+          'message': 'Invalid service.'
+          };
+        _req.replyText(404, JSON.stringify(result), "application/json");
         MC.loge(_MODULE_, 'Service "' + path + '" not registered.');
         return false;
       }
