@@ -75,7 +75,7 @@
             NSString *volumeName;
             [urlPath getResourceValue:&volumeName forKey:NSURLVolumeNameKey error:nil];
 
-            // Volume info is comma delimted pair of volume name and path.
+            // Volume info is a comma delimited pair of volume name and path.
             volumeInfo = [NSString stringWithFormat:@"%@,%@", volumeName, [urlPath path]];
             [arr addObject:volumeInfo];
         }

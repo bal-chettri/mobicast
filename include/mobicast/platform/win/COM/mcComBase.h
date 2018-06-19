@@ -131,7 +131,7 @@ public:
         return hr;
     }
 
-    // AddRef() / Release() simple delegates to the parent COM object for lifetime management.
+    // AddRef() / Release() simply delegates to the parent COM object for lifetime management.
 
     virtual ULONG STDMETHODCALLTYPE AddRef()
     {
@@ -334,7 +334,7 @@ public:
         return hr;
     }
 
-    // AddRef() / Release() simple delegates to the parent COM object for lifetime management.
+    // AddRef() / Release() simply delegates to the parent COM object for lifetime management.
 
     virtual ULONG STDMETHODCALLTYPE AddRef()
     {
