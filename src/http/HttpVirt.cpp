@@ -32,9 +32,10 @@ namespace http
 VirtualDirectory::VirtualDirectory(const char *baseDir)
 {
     // Get canonical path for the base directory.
-    char canonicalPath[MAX_PATH];
-    assert(GetCanonicalizedPath(baseDir, canonicalPath));    
-    _base_path = canonicalPath;
+    char canonicalPathBuff[MAX_PATH];
+    char *canonicalPath = GetCanonicalizedPath(baseDir, canonicalPathBuff);
+    assert(canonicalPath != NULL);
+    _base_path = canonicalPathBuff;
 
     // Make sure the canonical base path is also an absolute path.
     assert(IsPathAbsolute(_base_path.c_str()));
