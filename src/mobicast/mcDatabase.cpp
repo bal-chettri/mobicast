@@ -347,7 +347,7 @@ rowid_t Database::AddChannelSearch(rowid_t channelId, rowid_t searchId)
         {
             int rc;
             SQLITE_BIND_CHECK(sqlite3_bind_int64(stmt, 1, channelId))
-            SQLITE_BIND_CHECK(sqlite3_bind_int64(stmt, 1, searchId))
+            SQLITE_BIND_CHECK(sqlite3_bind_int64(stmt, 2, searchId))
             return SQLITE_OK;
         }
     }binder(channelId, searchId);
