@@ -14,7 +14,7 @@ API: Get channels
 URL: media-apis.jss?cmd=get_channels
 
 API: Get channel
-URL: media-apis.jss?cmd=get_channels&channel_id=id
+URL: media-apis.jss?cmd=get_channel&channel_id=id
 
 API: Add channel
 URL: media-apis.jss?cmd=add_channel
@@ -215,10 +215,10 @@ var AddChannelAPI = {
       
       // Create a search filter object.
       var size = 0;
-      var dateRange = null;
+      var dateRange = '';
       var subtitles = false;
-      var type = null;
-      var quality = null;
+      var type = '';
+      var quality = '';
       var max = 0;
       
       if('size' in search.filters) {
