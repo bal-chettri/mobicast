@@ -121,7 +121,7 @@ void Window::OnCreate()
     _pBrowser = new WebBrowser();
     _pBrowser->Create(_hWnd);
 
-    CheckMenuItem(GetMenu(_hWnd), ID_VIEW_STAYONTOP, _stayOnTop ? MF_CHECKED : MF_UNCHECKED);
+    CheckMenuItem(GetMenu(_hWnd), IDM_VIEW_STAYONTOP, _stayOnTop ? MF_CHECKED : MF_UNCHECKED);
 }
 
 void Window::OnDestroy()
@@ -157,7 +157,7 @@ void Window::OnCmdViewStayOnTop()
         _stayOnTop ? HWND_TOPMOST : HWND_NOTOPMOST,
         0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
-    CheckMenuItem(GetMenu(_hWnd), ID_VIEW_STAYONTOP, _stayOnTop ? MF_CHECKED : MF_UNCHECKED);
+    CheckMenuItem(GetMenu(_hWnd), IDM_VIEW_STAYONTOP, _stayOnTop ? MF_CHECKED : MF_UNCHECKED);
 }
 
 void Window::OnCmdHelpAbout()
@@ -178,7 +178,7 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case IDM_ABOUT:
             OnCmdHelpAbout();
             break;
-        case ID_VIEW_STAYONTOP:
+        case IDM_VIEW_STAYONTOP:
             OnCmdViewStayOnTop();
             break;
         }
@@ -236,6 +236,10 @@ static INT_PTR CALLBACK AboutDlgProc(HWND hWndDlg, UINT msg, WPARAM wParam, LPAR
     {
     case WM_INITDIALOG:
         {
+            // Set the icon image.
+            SendMessage(GetDlgItem(hWndDlg, IDC_STATIC), STM_SETIMAGE, IMAGE_ICON,
+                        (LPARAM)LoadIcon((HINSTANCE)GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_MOBICAST)));
+
             // Center the dialog box in the parent window.
             HWND hWndParent;
             if((hWndParent = GetParent(hWndDlg)) == NULL)  {
