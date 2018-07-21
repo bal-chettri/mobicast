@@ -452,7 +452,7 @@ void Service::ShutdownThreads()
     if(!_client_threads.empty())
     {
 #ifdef HTTP_PLATFORM_WIN
-        WaitForMultipleObjects(_client_threads.size(), _client_threads.data(), TRUE, INFINITE);
+        WaitForMultipleObjects(static_cast<DWORD>(_client_threads.size()), _client_threads.data(), TRUE, INFINITE);
         std::vector<HANDLE>::iterator it = _client_threads.begin();
         for(; it != _client_threads.end(); ++it) {
             CloseHandle(*it);
@@ -518,7 +518,7 @@ void *Service::_ServeClientThreadProc(void *param)
 #ifdef HTTP_PLATFORM_WIN
     return ret;
 #else
-    return (void *)ret;
+    return (void *)(ptrdiff_t)ret;
 #endif
 }
 

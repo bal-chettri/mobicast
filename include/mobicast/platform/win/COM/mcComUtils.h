@@ -129,12 +129,12 @@ class CComArray
 {
 public:
     // Construct a SAFEARRAY with capacity and autoFree flag.
-    CComArray(ULONG capacity, bool autoFree = true)
+    CComArray(size_t capacity, bool autoFree = true)
     {
-        _psa = SafeArrayCreateVector(VT_VARIANT, 0, capacity);
+        _psa = SafeArrayCreateVector(VT_VARIANT, 0, static_cast<ULONG>(capacity));
         SafeArrayAccessData(_psa, (void **)&_pItems);
         _autoFree = autoFree;
-        _count = capacity;
+        _count = static_cast<ULONG>(capacity);
     }
 
     // Construct with an existing SAFEARRAY to manipulate.

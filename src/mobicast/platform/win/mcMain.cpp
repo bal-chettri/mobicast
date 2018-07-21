@@ -368,5 +368,5 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, int)
     WSACleanup();
     OleUninitialize();
 
-    return msg.wParam;
+    return static_cast<int>(msg.wParam);
 }
