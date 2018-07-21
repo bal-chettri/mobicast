@@ -4,7 +4,6 @@
  */
 #include <http/HttpRequest.h>
 #include <http/HttpResponse.h>
-#include <http/HttpSock.h>
 #include <http/HttpDebug.h>
 
 namespace http

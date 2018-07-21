@@ -8,6 +8,7 @@
 #define __HTTP_CLIENT_H__
 
 #include <http/HttpBuffer.h>
+#include <http/HttpSock.h>
 
 namespace http
 {
@@ -25,7 +26,7 @@ public:
       * This is useful to map the Client to an existing connected socket, 
       * for e.g. returned by the accept() function. Client owns the socket 
       * thereafter. */
-    Client(int fd, uint32_t rem_addr, uint16_t rem_port);
+    Client(socket_t fd, uint32_t rem_addr, uint16_t rem_port);
 
     /** Dtor. */
     ~Client();
@@ -38,7 +39,7 @@ public:
     inline Buffer &GetResponseBuffer() { return _buff_out; }
 
     /** Returns the underlying socket file descriptor. */
-    inline int GetSocket() const { return _fd; }
+    inline socket_t GetSocket() const { return _fd; }
 
     /** Returns the client's remote address. */
     inline uint32_t GetRemoteAddr() const { return _rem_addr; }
@@ -72,7 +73,7 @@ public:
     int Flush();
 
 private:
-    int         _fd;            // SOCKET fd
+    socket_t    _fd;            // SOCKET fd
     uint32_t    _rem_addr;      // Remote IPv4 address
     uint16_t    _rem_port;      // Remote port
     bool        _connected;     // Is the client connected?

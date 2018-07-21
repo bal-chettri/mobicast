@@ -23,6 +23,20 @@
 #   include <errno.h>
 #endif
 
+// Define socket_t type for socket fd.
+#ifdef HTTP_PLATFORM_WIN
+    typedef SOCKET socket_t;
+#else
+    typedef int socket_t;
+#endif
+
+// Define invalid socket fd.
+#ifdef HTTP_PLATFORM_WIN
+#   define kInvalidSocket   INVALID_SOCKET
+#else
+#   define kInvalidSocket   (socket_t)(-1)
+#endif
+
 // Define socklen_t for Windows. Winsock uses int, not size_t, as length 
 // parameter to send/recv functions.
 #ifdef HTTP_PLATFORM_WIN

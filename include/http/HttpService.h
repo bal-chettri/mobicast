@@ -146,7 +146,7 @@ private:
     static int _ReqDataCallback(Request *req, const uint8_t *data, size_t length, void *ctx);
 
     VirtualHost         _vhost;
-    int                 _fd;
+    socket_t            _fd;
     uint32_t            _addr;
     uint32_t            _port;
     bool                _running;

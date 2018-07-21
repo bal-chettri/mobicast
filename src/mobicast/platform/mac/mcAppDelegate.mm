@@ -15,7 +15,6 @@
 #include <mobicast/platform/mac/objc-js/mcJsMediaManager.h>
 #include <mobicast/platform/mac/objc-js/mcJsStorage.h>
 #include <mobicast/platform/mac/objc-js/mcJsHttpRequest.h>
-#include <http/HttpSock.h>
 #include <http/HttpResponse.h>
 #include <http/HttpUtils.h>
 

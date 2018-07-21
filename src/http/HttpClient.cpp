@@ -5,7 +5,6 @@
 #include <http/HttpClient.h>
 #include <http/HttpCore.h>
 #include <http/HttpUtils.h>
-#include <http/HttpSock.h>
 #include <http/HttpDebug.h>
 #include <assert.h>
 
@@ -13,15 +12,15 @@ namespace http
 {
 
 Client::Client() :
-    _fd(-1),
+    _fd(kInvalidSocket),
     _rem_addr(0),
     _rem_port(0),
     _connected(0)
 { }
 
-Client::Client(int fd, uint32_t rem_addr, uint16_t rem_port)
+Client::Client(socket_t fd, uint32_t rem_addr, uint16_t rem_port)
 {
-    assert(fd != -1);
+    assert(fd != kInvalidSocket);
 
     // Initialize the client state.
     _fd = fd;
@@ -37,7 +36,7 @@ Client::~Client()
 
 bool Client::IsConnected() const
 {
-    return _fd != -1 && _connected;
+    return _fd != kInvalidSocket && _connected;
 }
 
 void Client::Close()
@@ -50,7 +49,8 @@ void Client::Close()
         // Gracefully shutdown the client connection and close the socket.
         shutdown(_fd, 2);
         closesocket(_fd);
-        _fd = -1;
+        _fd = kInvalidSocket;
+        SOCKET
 
         _connected = false;
     }
@@ -72,7 +72,7 @@ int Client::Poll()
     FD_SET(_fd, &set);
     struct timeval timeout = { HTTP_POLL_DURATION, 0 };
 
-    return select(_fd + 1, &set, NULL, NULL, &timeout);
+    return select((int)_fd + 1, &set, NULL, NULL, &timeout);
 }
 
 int Client::Read()

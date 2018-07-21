@@ -16,7 +16,6 @@
 #include <mobicast/platform/win/COM/mcComMediaManager.h>
 #include <mobicast/platform/win/COM/mcComStorage.h>
 #include <mobicast/platform/win/COM/mcComHttpRequest.h>
-#include <http/HttpSock.h>
 #include <http/HttpResponse.h>
 #include <http/HttpUtils.h>
 #include <Windows.h>

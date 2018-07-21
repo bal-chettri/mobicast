@@ -5,7 +5,6 @@
 #include <http/HttpService.h>
 #include <http/HttpHandler.h>
 #include <http/HttpResponse.h>
-#include <http/HttpSock.h>
 #include <http/HttpDebug.h>
 #include <http/HttpUtils.h>
 #include <assert.h>
@@ -24,7 +23,7 @@ Service::Service(const VirtualHost &vhost_) :
     _port(0),
     _running(false),
     _def_req_handler(NULL)
-{    
+{
     _def_req_handler = new RequestHandler();
 }
 
@@ -48,7 +47,6 @@ int Service::Init(int sock_type, uint32_t addr, uint16_t port)
 #endif
     
     HTTP_LOG("Creating service on port %d.", ntohs(port));
-    
     if((_fd = socket(AF_INET, sock_type, 0)) == -1) {
         SOCK_TRACE_ERROR();
         HTTP_LOG("Failed to create TCP socket.");
@@ -172,7 +170,7 @@ int Service::Run()
         FD_SET(_fd, &set);
         struct timeval timeout = { HTTP_POLL_DURATION, 0 };
 
-        int select_ret = select(_fd + 1, &set, NULL, NULL, &timeout);
+        int select_ret = select((int)_fd + 1, &set, NULL, NULL, &timeout);
         
         if(select_ret <= -1) {
             SOCK_TRACE_ERROR();
@@ -187,8 +185,8 @@ int Service::Run()
         struct sockaddr_in peer_addr;
         socklen_t peer_size = sizeof(peer_addr);
 
-        int peer = accept(_fd, (struct sockaddr *)&peer_addr, &peer_size);
-        if(peer == -1) {
+        socket_t peer = accept(_fd, (struct sockaddr *)&peer_addr, &peer_size);
+        if(peer == kInvalidSocket) {
             if(IS_ERR_EWOULDBLOCK(socketlasterr())) {
                 continue;
             }
