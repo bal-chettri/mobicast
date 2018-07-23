@@ -54,20 +54,22 @@ var PlayMediaAPI = {
             var formats = pinfo.plugin.getPlayer().getMediaFormats();
             if(formats.indexOf(format) < 0) {
               _req.replyText(200, this._errorResult('Plugin doesn\'t support the format.'), "application/json");
-            } else if(!MC.activatePlugin(pid)) {
-              _req.replyText(200, this._errorResult('Failed to activate the plugin.'), "application/json");
             } else {
-              var url = media['mediaUrl'];
-              if(pinfo.plugin.getPlayer().play(url)) {
+              var activateStatus = MC.activatePlugin(pid, function() {
+                var url = media['mediaUrl'];
+                if(pinfo.plugin.getPlayer().play(url)) {
+                  if('registerPlayer' in media && media['registerPlayer'] == true) {
+                    MC.mm.registerMediaHandler(format, pid);
+                  }
+                }
+              });
+              if(activateStatus) {
                 var result = {
                   'status': 'success'
                 }
-                if('registerPlayer' in media && media['registerPlayer'] == true) {
-                  MC.mm.registerMediaHandler(format, pid);
-                }
                 _req.replyText(200, JSON.stringify(result), "application/json");
               } else {
-                _req.replyText(200, this._errorResult('Failed to play media.'), "application/json");
+                _req.replyText(200, this._errorResult('Failed to activate the plugin.'), "application/json");
               }
             }
           }

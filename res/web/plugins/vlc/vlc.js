@@ -132,6 +132,10 @@ _vlc.player._close = function() {
 
 // Plugin interface
 
+_vlc.preLoad = function() {
+  MC.log('VLC', 'VLC plugin loading');
+}
+
 _vlc.onLoad = function() {
   MC.log('VLC', 'VLC plugin loaded');
   // Wait until player is ready.

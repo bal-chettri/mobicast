@@ -328,8 +328,12 @@ window.onload = function() {
       }
       return false;
     }
-    MC.activatePlugin = function(id) {
+    MC.activatePlugin = function(id, onDone) {
       MC.loge(_MODULE_, 'Activating plugin "' + id + '"');
+      if(typeof(onDone) != 'function') {
+        MC.loge(_MODULE_, 'onDone is not a function.');
+        return false;
+      }
       var pinfo = MC.findPlugin(id);
       if(pinfo == null) {
         MC.loge(_MODULE_, 'Plugin "' + id + '" not found in plugin list.');
@@ -338,14 +342,19 @@ window.onload = function() {
         MC.loge(_MODULE_, 'Plugin "' + id + '" not registered.');
         return false;
       }
-      if(pinfo != MC._curPlugin) {
+      if(pinfo == MC._curPlugin) {
+        onDone();
+      } else {
         if(MC._curPlugin != null) {
           MC._curPlugin.plugin.onClose();
           MC.clearContent();
         }
-        MC.loadContent(pinfo.meta.player);
-        MC._curPlugin = pinfo;
-        pinfo.plugin.onLoad();
+        pinfo.plugin.preLoad();
+        MC.loadContent(pinfo.meta.player, function() {
+          MC._curPlugin = pinfo;
+          pinfo.plugin.onLoad();
+          onDone();
+        });
       }
       return true;
     }
@@ -393,10 +402,13 @@ window.onload = function() {
       
       parentElem.replaceChild(content, prevContent);
     }
-    MC.loadContent = function(url) {
+    MC.loadContent = function(url, onDone) {
       MC.httpGet(url, function(xhttp) {
         MC.setContent(xhttp.responseText);
         MC.runScripts();
+        if(typeof(onDone) == 'function') {
+          onDone();
+        }
       });
     }
     MC.clearContent = function() {
