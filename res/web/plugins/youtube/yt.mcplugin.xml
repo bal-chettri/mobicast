@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mcplugin>
+  <id>mc.plugin.yt</id>
+  <title>Youtube(Player only)</title>
+  <description>Youtube(Player only) plugin for MobiCast</description>
+  <author>Bal Chettri</author>
+  <version>1.0.0</version>
+  <player>yt.html</player>
+  <main>yt.js</main>
+  <capabilities>
+    <capability>player</capability>
+  </capabilities>
+</mcplugin>
