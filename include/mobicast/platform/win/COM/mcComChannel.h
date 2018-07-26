@@ -30,7 +30,7 @@ public:
     // Public internal methods not exposed to COM.
     inline BSTR GetId() const { return _id; }
     inline BSTR GetTitle() const { return _title; }
-    inline std::list<_MediaSearch *> GetSearches() const { return _searches; }
+    inline const std::list<_MediaSearch *> &GetSearches() const { return _searches; }
 
 private:
     BSTR                        _id;
