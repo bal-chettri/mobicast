@@ -400,6 +400,38 @@ var ListChannelAPI = {
 };
 
 //
+// DeleteChannelAPI.
+//
+var DeleteChannelAPI = {
+  main: function(_req, qs) {
+    var channelId = qsGet(qs, 'channel_id');
+    var result;
+    
+    if(channelId == undefined) {
+      result = {
+        'status': 'error',
+        'message': 'Channel id missing.'
+      };
+    } else {
+      var success = MC.mm.deleteChannel(channelId);
+      if(success == true) {
+        result = {
+          'status': 'success'
+        };
+      } else {
+        result = {
+          'status': 'error',
+          'message': 'Invalid channel id.'
+        };
+      }
+    }
+    
+    _req.replyText(200, JSON.stringify(result), "application/json");
+    return true;
+  }
+};
+
+//
 // ListMediaHandlersAPI
 //
 var ListMediaHandlersAPI = { 
@@ -454,6 +486,10 @@ MC.registerService("/services/media-api.jss", function(_req, _resp) {
     else if(cmd == 'list_channel')
     {
       return ListChannelAPI.main(_req, qs);
+    }
+    else if(cmd == 'delete_channel')
+    {
+      return DeleteChannelAPI.main(_req, qs);
     }
     else if(cmd == 'list_media_handlers')
     {

@@ -102,11 +102,20 @@ public:
     /** Adds a new search. */
     rowid_t AddSearch(const char *source, const char *keywords, const char *filters);
 
+    /** Deletes a search. */
+    void DeleteSearch(rowid_t id);
+
     /** Adds a new channel. */
     rowid_t AddChannel(const char *title);
 
+    /** Deletes a channel. */
+    void DeleteChannel(rowid_t channelId);
+
     /** Adds a new search for channel. */
     rowid_t AddChannelSearch(rowid_t channelId, rowid_t searchId);
+
+    /** Deletes all channel search links. */
+    void DeleteChannelSearches(rowid_t channelId);
 
     /** Converts ValueType to string . */
     static const char *ValueTypeToString(ValueType type);

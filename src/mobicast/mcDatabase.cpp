@@ -308,6 +308,25 @@ rowid_t Database::AddSearch(const char *source, const char *keywords, const char
     }
 }
 
+void Database::DeleteSearch(rowid_t searchId)
+{
+    struct Binder
+    {
+        rowid_t searchId;
+
+        Binder(rowid_t searchId_) : searchId(searchId_) { }
+
+        int operator() (sqlite3_stmt *stmt)
+        {
+            int rc;
+            SQLITE_BIND_CHECK(sqlite3_bind_int64(stmt, 1, searchId))
+            return rc;
+        }
+    }binder(searchId);
+
+    SQLiteExec sqlExec(_db, kSqlDeleteSearch, binder, SQLiteExec::NullReader(), nullptr);
+}
+
 rowid_t Database::AddChannel(const char *title)
 {
     struct Binder
@@ -331,6 +350,25 @@ rowid_t Database::AddChannel(const char *title)
     } else {
         return -1;
     }
+}
+
+void Database::DeleteChannel(rowid_t channelId)
+{
+    struct Binder
+    {
+        rowid_t channelId;
+
+        Binder(rowid_t channelId_) : channelId(channelId_) { }
+
+        int operator() (sqlite3_stmt *stmt)
+        {
+            int rc;
+            SQLITE_BIND_CHECK(sqlite3_bind_int64(stmt, 1, channelId))
+            return rc;
+        }
+    }binder(channelId);
+
+    SQLiteExec sqlExec(_db, kSqlDeleteChannel, binder, SQLiteExec::NullReader(), nullptr);
 }
 
 rowid_t Database::AddChannelSearch(rowid_t channelId, rowid_t searchId)
@@ -359,6 +397,25 @@ rowid_t Database::AddChannelSearch(rowid_t channelId, rowid_t searchId)
     } else {
         return -1;
     }
+}
+
+void Database::DeleteChannelSearches(rowid_t channelId)
+{
+    struct Binder
+    {
+        rowid_t channelId;
+
+        Binder(rowid_t channelId_) : channelId(channelId_) { }
+
+        int operator() (sqlite3_stmt *stmt)
+        {
+            int rc;
+            SQLITE_BIND_CHECK(sqlite3_bind_int64(stmt, 1, channelId))
+            return rc;
+        }
+    }binder(channelId);
+
+    SQLiteExec sqlExec(_db, kSqlDeleteChannelSearches, binder, SQLiteExec::NullReader(), nullptr);
 }
 
 const char *Database::ValueTypeToString(Database::ValueType type)

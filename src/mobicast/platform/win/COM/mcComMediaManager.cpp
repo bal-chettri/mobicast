@@ -270,6 +270,41 @@ STDMETHODIMP CMediaManager::listChannel(BSTR channelId, VARIANT *pRetVal)
     return S_OK;
 }
 
+STDMETHODIMP CMediaManager::deleteChannel(BSTR channelId, VARIANT_BOOL *pRetVal)
+{
+    COM_CHECK_ARG(channelId)
+    
+    *pRetVal = VARIANT_FALSE;
+
+    // Get the channel object.
+    _Channel *pChannel;
+    HRESULT hr = getChannel(channelId, &pChannel);
+    if(FAILED(hr) || pChannel == NULL) {
+        return hr;
+    }
+
+    // Delete all search records.
+    const std::list<_MediaSearch *> &searches = static_cast<CChannel *>(pChannel)->GetSearches();
+    for(std::list<_MediaSearch *>::const_iterator it = searches.begin(); it != searches.end(); ++it)
+    {
+        CMediaSearch *pSearch = static_cast<CMediaSearch *>(*it);
+        rowid_t nSearchId = _wtoi64(pSearch->GetId());
+        _db->DeleteSearch(nSearchId);
+    }
+
+    // Delete all searches links.
+    rowid_t nChannelId = _wtoi64(channelId);
+    _db->DeleteChannelSearches(nChannelId);
+
+    // Delete channel.
+    _db->DeleteChannel(nChannelId);
+
+    pChannel->Release();
+
+    *pRetVal = VARIANT_TRUE;
+    return S_OK;
+}
+
 STDMETHODIMP CMediaManager::registerMediaHandler(BSTR format, BSTR pluginId)
 {
     COM_CHECK_ARG(format && wcslen(format) > 1 && format[0] == L'.');

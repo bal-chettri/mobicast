@@ -136,6 +136,8 @@ library LIBMobiCast
 
         HRESULT listChannel([in] BSTR channelId, [out, retval] VARIANT *pRetVal);
 
+        HRESULT deleteChannel([in] BSTR channelId, [out, retval] VARIANT_BOOL *pRetVal);
+
         HRESULT registerMediaHandler([in] BSTR format, [in] BSTR pluginId);
         HRESULT listMediaHandlers([out, retval] VARIANT *pRetVal);
     }

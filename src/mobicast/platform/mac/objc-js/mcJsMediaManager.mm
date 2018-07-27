@@ -181,6 +181,31 @@ static int GetChannelSearchesCallback(const MobiCast::Database::ChannelSearchRow
     return mediaList;
 }
 
+- (BOOL)deleteChannelById:(NSString *)channelId
+{
+    // Get the channel object.
+    MCJSChannel *channel = [self getChannelById:channelId];
+    if(channel == nil) {
+        return NO;
+    }
+    
+    // Delete all search records.
+    NSArray<MCJSMediaSearch *> *searches = channel.searches;
+    for(MCJSMediaSearch *search in searches) {
+        MobiCast::rowid_t nSearchId = atoll([search.searchId UTF8String]);
+        _db->DeleteSearch(nSearchId);
+    }
+
+    // Delete all searches links.
+    MobiCast::rowid_t nChannelId = atoll([channelId UTF8String]);
+    _db->DeleteChannelSearches(nChannelId);
+
+    // Delete channel.
+    _db->DeleteChannel(nChannelId);
+
+    return YES;
+}
+
 - (void)registerMediaHandler:(NSString *)format plugin:(NSString *)pluginId
 {
     // Register the media handler under key _MEDIA_HANDLER_{.format}
@@ -334,6 +359,7 @@ JS_EXPORT_METHOD(createSearchFilterWithSize:dateRange:subtitles:type:quality:max
 JS_EXPORT_METHOD(createSearchWithMediaSource:keywords:filter:, "createSearch")
 JS_EXPORT_METHOD(addChannelWithTitle:searches:, "addChannel")
 JS_EXPORT_METHOD(listChannelById:, "listChannel")
+JS_EXPORT_METHOD(deleteChannelById:, "deleteChannel")
 JS_EXPORT_METHOD(registerMediaHandler:plugin:, "registerMediaHandler")
 JS_EXPORT_METHOD(listMediaHandlers, "listMediaHandlers")
 JS_SELECTOR_END()

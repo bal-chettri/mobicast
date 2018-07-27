@@ -27,6 +27,7 @@
 
 - (NSString *)addChannelWithTitle:(NSString *)title searches:(NSArray *)searches;
 - (NSArray *)listChannelById:(NSString *)channelId;
+- (BOOL)deleteChannelById:(NSString *)channelId;
 - (void)registerMediaHandler:(NSString *)format plugin:(NSString *)pluginId;
 - (NSArray *)listMediaHandlers;
 

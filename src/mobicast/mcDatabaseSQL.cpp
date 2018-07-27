@@ -36,10 +36,19 @@ const char* const kSqlGetChannels =
 const char* const kSqlAddSearch =
 "INSERT INTO SEARCHES (Source,Keywords,Filters) VALUES(?1,?2,?3);";
 
+const char* const kSqlDeleteSearch =
+"DELETE FROM SEARCHES WHERE ROWID = ?1;";
+
 const char* const kSqlAddChannel =
 "INSERT INTO CHANNELS (Title) VALUES(?1);";
 
+const char* const kSqlDeleteChannel =
+"DELETE FROM CHANNELS WHERE ROWID = ?1;";
+
 const char* const kSqlAddChannelSearch =
 "INSERT INTO CHANNEL_SEARCHES (ChannelId, SearchId) VALUES(?1, ?2);";
+
+const char* const kSqlDeleteChannelSearches =
+"DELETE FROM CHANNEL_SEARCHES WHERE ChannelId = ?1;";
 
 } // MobiCast namespace

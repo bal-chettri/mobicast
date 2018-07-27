@@ -16,8 +16,11 @@ extern const char* const kSqlGetChannel;
 extern const char* const kSqlGetChannelSearches;
 extern const char* const kSqlGetChannels;
 extern const char* const kSqlAddSearch;
+extern const char* const kSqlDeleteSearch;
 extern const char* const kSqlAddChannel;
+extern const char* const kSqlDeleteChannel;
 extern const char* const kSqlAddChannelSearch;
+extern const char* const kSqlDeleteChannelSearches;
 
 } // MobiCast namespace
 
