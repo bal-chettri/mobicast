@@ -50,7 +50,6 @@ void Client::Close()
         shutdown(_fd, 2);
         closesocket(_fd);
         _fd = kInvalidSocket;
-        SOCKET
 
         _connected = false;
     }
