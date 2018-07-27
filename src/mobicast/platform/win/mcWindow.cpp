@@ -52,8 +52,8 @@ void Window::Create(int width, int height)
     wcex.style = 0;
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
-    wcex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-    wcex.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+    wcex.hIcon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_MOBICAST));
+    wcex.hIconSm = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_MOBICAST_SMALL));
     wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
     wcex.hbrBackground = CreateSolidBrush(RGB(255,255,255));
 #ifdef MC_DEBUG
