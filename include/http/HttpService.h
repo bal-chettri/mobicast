@@ -9,6 +9,7 @@
 
 #include <http/HttpRequest.h>
 #include <http/HttpVirt.h>
+#include <http/HttpDebug.h>
 #include <vector>
 #include <list>
 #include <map>
@@ -142,7 +143,10 @@ private:
     static void *_ServeClientThreadProc(void *param);
 #endif
 
+#ifdef HTTP_DEBUG
+
     static void _LogRequest(Request *req);
+#endif
     static int _ReqDataCallback(Request *req, const uint8_t *data, size_t length, void *ctx);
 
     VirtualHost         _vhost;

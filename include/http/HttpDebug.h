@@ -14,6 +14,9 @@
 #   define HTTP_DEBUG
 #endif
 
+// Enable HTTP_LOG_HEADERS for logging request headers.
+#define HTTP_LOG_HEADERS        0
+
 namespace http
 {
 

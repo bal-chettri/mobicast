@@ -5,7 +5,6 @@
 #include <http/HttpService.h>
 #include <http/HttpHandler.h>
 #include <http/HttpResponse.h>
-#include <http/HttpDebug.h>
 #include <http/HttpUtils.h>
 #include <assert.h>
 #include <time.h>
@@ -360,9 +359,12 @@ int Service::HandleRequest(Request *req)
 
 int Service::HandleRequestData(Request *req, const uint8_t *data, size_t length)
 {
-    if(req->GetState() == Request::kStateReceivedReq) {        
+#ifdef HTTP_DEBUG
+    if(req->GetState() == Request::kStateReceivedReq) {
         _LogRequest(req);
-    } else if(req->GetState() == Request::kStateComplete) {
+    }
+#endif
+    if(req->GetState() == Request::kStateComplete) {
         return HandleRequest(req);
     }
     return kErrorNone;
@@ -522,9 +524,9 @@ void *Service::_ServeClientThreadProc(void *param)
 #endif
 }
 
+#ifdef HTTP_DEBUG
 void Service::_LogRequest(Request *req)
 {
-#ifdef HTTP_DEBUG
     Client *client = req->GetClient();
 
     char sz_timestamp[100];
@@ -548,8 +550,18 @@ void Service::_LogRequest(Request *req)
         req->GetMethod().c_str(), 
         req->GetResource().c_str()
         );
+
+#if HTTP_LOG_HEADERS
+    HTTP_LOG("Headers:");
+    const Request::HeaderMap *headers = req->GetHeaders();
+    if(headers != NULL) {
+        for(Request::HeaderMap::const_iterator it = headers->begin(); it != headers->end(); ++it) {
+            HTTP_LOG("%s: %s", it->first.c_str(), it->second.c_str());
+        }
+    }
 #endif
 }
+#endif // HTTP_DEBUG
 
 int Service::_ReqDataCallback(Request *req, const uint8_t *data, size_t length, void *ctx)
 {
