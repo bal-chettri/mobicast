@@ -104,13 +104,19 @@ int MatchStr::MatchEnd(const char **ppbuffer, size_t size, std::string &text)
 //
 // HtmlStrainer class.
 //
+HtmlStrainer::HtmlStrainer() :
+    _repeat(false)
+{
+    _texts.reserve(10);
+}
+
 void HtmlStrainer::Init(const char *start_tag, const char *end_tag)
 {
     Reset();
 
     _startTags.push_back(MatchStr(start_tag));
     _endTag.Init(end_tag);
-    _repeat = false;    
+    _repeat = false;
 }
 
 void HtmlStrainer::Init(const char *start_tag, const char *end_tag, bool repeat)
