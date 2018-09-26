@@ -34,5 +34,5 @@ function mc_main() {
     MC.setup.init().next();
   } else {
     MC.loadContent('home.html');
-  }  
+  }
 }

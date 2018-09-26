@@ -547,7 +547,7 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
           'URL: ' + url,
           'Line: ' + lineNo,
           'Column: ' + columnNo
-      ].join(', ');      
+      ].join(', ');
       errmsg = 'Script Error occured. ' + message;
   }
   alert(msg);
