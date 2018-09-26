@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>MobiCast</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />    
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  
+  <body>
+    <div class="wrapper">
+      <nav id="sidebar">
+        <button type="button" id="sidebar_dismiss_button" class="btn round-btn">
+          <i class="glyphicon glyphicon-arrow-left"></i>
+        </button>
+        <ul class="list-unstyled components">
+          <li><a id="menu_devices" href="#">Devices</a></li>
+          <li><a id="menu_channels" href="#">Channels</a></li>
+          <li><a id="menu_plugins" href="#">Plugins</a></li>
+          <li><a id="menu_fav" href="#">Favourites</a></li>
+          <li>
+            <a id="menu_settings" href="#submenu_settings" data-toggle="collapse" aria-expanded="false">Settings</a>
+            <ul id="submenu_settings" class="collapse list-unstyled">
+              <li id="menu_settings_preferences"><a href="#">Preferences</a></li>
+            </ul>
+          </li>
+          <li><a id="menu_about" href="#">About</a></li>
+        </ul>
+      </nav>
+      <div id="content">
+        <div class="navbar-top">
+          <button type="button" id="sidebar_button" class="btn round-btn btn-left-floated">
+            <i class="glyphicon glyphicon-th-large"></i>
+          </button>
+          <button type="button" id="nav_left_button" class="btn round-btn btn-left-floated" style="display:none;">
+            <i class="glyphicon glyphicon-arrow-left"></i>
+          </button>
+          <div id="main-title" class="title"></div>          
+          <button type="button" id="player_button" class="btn round-btn btn-right-floated">
+            <i class="glyphicon glyphicon-facetime-video"></i>
+          </button>
+          <button type="button" id="edit_button" class="btn round-btn btn-right-floated" style="display:none;">
+            <i class="glyphicon glyphicon-edit"></i>
+          </button>
+        </div>
+        <div id="main-content">
+        </div>
+      </div>
+    </div>
+
+    <div class="loader"></div>
+    <div class="overlay"></div>
+
+    <!-- Templates -->
+    <div id="template-channel-row-item" style="display:none;">
+      <div class="row-item" id="$data.id" title="$data.title">        
+        <div class="controls" style="display:none;">
+          <button type="button" id="btn_edit" class="btn round-btn">
+            <i class="glyphicon glyphicon-pencil"></i>
+          </button>
+          <button type="button" id="btn_remove" class="btn round-btn">
+            <i class="glyphicon glyphicon-remove-circle"></i>
+          </button>
+        </div>
+        <div class="text"><a href="#">$data.title</a></div>
+      </div>
+    </div>
+    
+    <div id="template-channel-row-item-new" style="display:none;">
+      <div class="row-item" id="-1">
+        <div class="text ghost"><a href="#">New Channel</a></div>
+      </div>
+    </div>
+    
+    <div id="template-channel-media-row-item" style="display:none;">
+      <div class="row-item media-item">
+        <div class="media-container">
+          <div class="thumbnail-container">
+            <img id="$index" src="$data.thumbnailUrl" class="thumbnail" />
+          </div>
+          <div class="controls">
+            <div id="$index" class="dropdown">
+              <button class="dropdown-toggle" type="button" data-toggle="dropdown">
+                Play&nbsp;<span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-right"></ul>
+            </div>
+          </div>          
+        </div>
+        <div class="media-info">
+          <div class="text media-text">$data.title</div>
+          <div><span class="description">($data.duration)</span></div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="template-channel-media-row-noitems" style="display:none;">
+      <div class="row-item media-item">
+        <div>No media available on this channel.</div>
+      </div>
+    </div>
+
+    <div id="template-plugin-row-item" style="display:none;">
+      <div class="row-item" id="$data.id">
+        <div class="text"><a href="#">$data.title<span class="description">&nbsp;&nbsp;($data.version)</span></a></div>
+      </div>
+    </div>
+    
+    <div id="template-main" style="display:none;">
+      <div class="view">
+        <div class="content">
+        </div>
+      </div>
+    </div>
+    
+    <div id="template-about" style="display:none;">
+      <div class="view">
+        <div class="content padded">
+          <h4>Mobicast</h4>
+          <p>Version 0.0.1</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dialogs -->
+    
+    <div id="player" class="dialog player" style="display:none;">
+      <div class="header">        
+        <div class="title">Living Room TV</div>
+      </div>
+      <div class="content" style="align-self:center;">
+        <div class="segment">
+          <div id="caption" class="caption">
+            Playing "Media"
+          </div>
+        </div>
+        <div class="segment">
+          <button id="btn-pause" type="button" class="btn btn-default control-btn">Pause</button><br />
+        </div>
+        <div class="segment">
+          <button id="btn-rewind" type="button" class="btn btn-default control-btn">Rewind</button>        
+        </div>
+        <div class="segment">
+          <button id="btn-mute" type="button" class="btn btn-default control-btn">Mute</button><br />
+        </div>
+        <div class="segment">
+          <button id="btn-vol-down" type="button" class="btn btn-default btn-circle-medium">-</button>
+          &nbsp;Volume&nbsp;
+          <button id="btn-vol-up" type="button" class="btn btn-default btn-circle-medium">+</button>
+        </div>
+      </div>
+      <div class="footer">
+        <button id="btn-close" type="button" class="btn btn-default">Close</button>
+      </div>
+    </div>
+    
+    <div id="channel-dialog" class="dialog channel-dialog" style="display:none;">
+      <div class="header">
+        <div class="title">Add Channel</div>
+      </div>
+      <div class="content">
+        <div class="segment">
+          <div class="field">Title</div>
+          <input id="channel_title" class="input" type="text"/>
+        </div>
+        <div class="segment">
+          <div>Searches</div>          
+          <div class="controls">
+            <button id="btn-ch-0" class="btn btn-default btn-circle-small" style="display:none;">1</button>
+            <button id="btn-ch-1" class="btn btn-default btn-circle-small" style="display:none;">2</button>
+            <button id="btn-ch-2" class="btn btn-default btn-circle-small" style="display:none;">3</button>
+            <button id="btn-ch-add" class="btn btn-success btn-circle-small" style="display:block;">+</button>
+            <button id="btn-ch-remove" class="btn btn-danger btn-circle-small" style="display:none; float:right">-</button>
+            <div style="clear:both;"></div>
+          </div>
+        </div>
+        <div class="segment">
+          <div class="sub-content">
+            <div class="flex-segment">
+              <div class="field">Source</div>
+                <div id="dropdown_source" class="dropdown">
+                  <button id="dropdown_source_btn" class="dropdown-toggle" type="button" data-toggle="dropdown">
+                    <span class="caret"></span>
+                  </button>
+                  <ul id="dropdown_source_list" class="dropdown-menu"></ul>
+                </div>
+            </div>
+            <div class="flex-segment">
+              <div class="field">Keywords</div>
+                <textarea id="keywords" class="form-control" rows="3"></textarea>
+            </div>
+          </div>
+        </div>        
+      </div>
+      <div class="footer">
+        <button id="btn-create" type="button" class="btn btn-primary">Create</button>
+        <button id="btn-close" type="button" class="btn btn-default">Close</button>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>    
+    <script src="client.js"></script>
+
+  </body>
+</html>
+
+<script type="text/javascript">
+var sidebar, dlgPlayer, dlgChannel;
+
+$(document).ready(function () {
+  // Fetch plugins data.
+  $.get(ApiFactory.getPluginsUrl(), function(data, textStatus, jqxhr) {
+    var status = data.status;
+    if(status == 'success') {
+      AppState.plugins = data.plugins;
+      console.log('Plugins data available.');
+    }
+  }).always(function() {
+    // Fetch media handlers data.
+    $.get(ApiFactory.listMediaHandlersUrl(), function(data, textStatus, jqxhr) {
+      var status = data.status;
+      if(status == 'success') {
+        AppState.mediaHandlers = data.handlers;
+        console.log('Media handlers data available.');
+      }
+    });
+  }).always(function() {
+    // Create sidebar.
+    sidebar = new SideBar();
+    // Initialize view manager.
+    ViewManager.get();
+  });
+    
+  $('#player_button').on('click', function() {
+    if(dlgPlayer == undefined) {
+      dlgPlayer = new PlayerDialog();
+    }
+    dlgPlayer.show();
+  });
+});
+
+</script>

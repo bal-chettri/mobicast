@@ -1,0 +1,561 @@
+@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+
+/* Common styles */
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #ffffff;
+  color: #454545;
+}
+
+p {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.1em;
+  font-weight: 300;
+  line-height: 1.7em;
+  color: #999;
+}
+
+a, a:hover, a:focus {
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+ul ul a {
+  font-size: 0.9em !important;
+  padding-left: 30px !important;
+}
+
+ul.CTAs {
+  padding: 20px;
+}
+
+ul.CTAs a {
+  text-align: center;
+  font-size: 0.9em !important;
+  display: block;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+a.download {
+  background: #fff;
+  color: #7386D5;
+}
+
+a.article, a.article:hover {
+  background: #6d7fcc !important;
+  color: #fff !important;
+}
+
+.line {
+  width: 100%;
+  height: 1px;
+  border-bottom: 1px dashed #ddd;
+  margin: 40px 0;
+}
+
+/* Widgets */
+
+.round-btn {
+  width: 36px;
+  height: 36px;
+  padding: 2px 4px;
+  background-color: transparent;
+  color: #4e4e4e;
+  box-shadow: none;
+  border-radius: 50%;
+}
+
+.round-btn:hover {
+  background-color: #fff;
+}
+
+.round-btn:active {
+  background-color: #f0f0f0;
+  color: #4e4e4e;
+  box-shadow: none;
+}
+
+.round-btn:focus {
+  outline: 0;
+  box-shadow: none;
+}
+
+.round-btn .glyphicon {
+  font-size: 20px;
+  top: 2px;
+}
+
+.btn-circle-small  {
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  font-size: 0.8em;
+}
+
+.btn-circle-medium {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+}
+
+.overlay {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 2000;
+  display: none;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loader  {
+  border: 5px solid #f3f3f3;
+    border-top-width: 5px;
+    border-top-style: solid;
+    border-top-color: rgb(243, 243, 243);
+  -webkit-animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
+
+  border-top: 5px solid #555;
+  border-radius: 50%;
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-top: -25px;
+  margin-left: -25px;
+  width: 50px;
+  height: 50px;
+  display: none;
+}
+
+/* Top bar */
+
+.top-bar {
+
+}
+
+.player-mini {
+  padding: 6px;
+  background-color: #d9d9d9;
+}
+
+.btn:focus, .btn:active  {
+  outline: none;
+}
+
+.btn-default:focus, .btn-default:active {
+  background-color: #fff;
+  outline: none;
+}
+
+/* Navigation bar */
+
+.navbar-top {
+  position: fixed;
+  width: 100%;
+  z-index: 1500;
+  padding: 4px;
+  background-color: #f9f9f9;
+  border-bottom: #e0e0e0 solid 1px;
+}
+
+.navbar-top .title {
+  font-size: 20px;
+  float: left;
+  line-height: 1.6;
+}
+
+.navbar-top .btn-left-floated {  
+  margin-right: 5px;
+  float: left;
+}
+
+.navbar-top .btn-right-floated {
+  float: right;
+}
+
+.player-mini {
+  float: right;
+  background-color: #d9d9d9;
+}
+
+/* Sidebar */
+
+#sidebar {
+  width: 80%;
+  position: fixed;
+  top: 0;
+  left: -85%;
+  height: 100vh;
+  z-index: 2500;
+  background: #cfe0e3;
+  transition: all 0.3s;
+  overflow-y: scroll;
+  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2);
+  font-size: 16px;
+}
+
+#sidebar.active {
+  left: 0;
+}
+
+#sidebar_dismiss_button {
+  margin: 6px;
+}
+
+#dismiss:hover {
+  background: #fff;
+  color: #7386D5;
+}
+
+#sidebar .sidebar-header {
+  padding: 10px;
+  background: #89d3e9;
+}
+
+#sidebar ul.components {
+  padding: 0px 0;
+}
+
+#sidebar ul p {
+  color: #fff;
+  padding: 10px;
+}
+
+#sidebar ul li a {
+  padding: 10px;
+  font-size: 1.1em;
+  display: block;
+}
+#sidebar ul li a:hover {
+  color: #7386D5;
+  background: #fff;
+}
+
+#sidebar ul li.active > a, a[aria-expanded="true"] {
+
+}
+
+/* Content */
+
+#content {
+  width: 100%;
+  padding: 0px;
+  min-height: 100vh;
+  transition: all 0.3s;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+#main-content {
+  position: relative;
+  top: 0px;
+}
+
+/* View */
+
+div.view {  
+}
+
+div.view .title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+div.view .content {
+}
+
+div.view .content.padded {
+  padding: 8px;
+}
+
+div.view .vlayout {
+}
+
+div.view .vlayout.padded {
+  padding: 8px;
+}
+
+div.view .row-item {
+  font-size: 16px;
+  padding: 8px;
+  margin-bottom: 1px;
+  border-bottom: solid 1px #dfdfdd;  
+}
+
+div.view .row-item.selected {
+  background-color: #eef5f6;
+}
+
+div.view .row-item .controls {
+  float: right;
+}
+
+div.view .row-item .controls .btn {
+  padding: 2px 6px;
+  margin-left: 4px;
+}
+
+div.view .row-item .text {
+  line-height: 2em;
+}
+
+div.view .row-item .description {
+  font-size: 0.8em;
+}
+
+div.view .row-item .ghost {
+  color: #dbdbdb;
+  font-style: italic;
+  font-size: 14px;
+  font-weight: lighter;
+}
+
+div.view .row-item .edit {
+  background-image: url("close.png");
+  position: relative;
+  float: right;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  margin-top: -12px;
+  background-size: 100%;
+  opacity: 1;
+  cursor: pointer;
+}
+
+div.view .media-item {
+  font-size: 14px;
+  height: unset;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: solid 1px #dfdfdd;
+}
+
+div.view .media-item .media-container {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-flow: row;
+  -webkit-flex-flow: row;
+  flex-flow: row;  
+}
+
+div.view .media-item .thumbnail-container {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  flex: 1;  
+  margin-bottom: 8px;
+}
+
+div.view .media-item .thumbnail {
+  border: none;
+  margin: 0px;
+  width: 100%;
+  /*height: 100%;*/
+}
+
+div.view .media-item .controls {
+  padding: 4px;
+  align-self: center;
+}
+
+div.view .media-item .media-info {
+  padding: 0px 10px;
+}
+
+div.view .media-item .media-text {
+  line-height: 1.5em;
+  max-height: 3em;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* Dialog */
+
+div.dialog {
+  position: fixed;
+  z-index: 2500;
+  width: 85%;
+  height: 85%;
+  left: 7.5%;
+  top: 7.5%;
+  background-color: #e9e9e9;
+  padding: 0px;  
+  border: solid 1px #dbdbdb;
+  text-align: center;
+  border-radius: 8px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-flow: column;
+  -webkit-flex-flow: column;
+  flex-flow: column;  
+}
+
+div.dialog .header {
+  padding: 8px;
+}
+
+div.dialog .footer {
+  background-color: #dfdfdf;
+  width: 100%;
+  height: 50px;
+  padding: 8px;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+div.dialog .content {
+  width: 100%;
+  padding: 8px;
+  overflow: hidden;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  flex: 1;
+  overflow: scroll;
+}
+
+div.dialog .sub-content {
+  padding: 8px;
+}
+
+div.dialog .close {
+  background-image: url("close.png");
+  background-size: 100%;
+  float: right;
+  width: 24px;
+  height: 24px;
+  opacity: 1;
+  cursor: pointer;
+}
+
+div.dialog .plus {
+  background-image: url("plus.png");
+  width: 24px;
+  height: 24px;
+  background-size: 100%;
+  cursor: pointer;
+}
+
+div.dialog .remove {
+  background-image: url("close.png");
+  width: 24px;
+  height: 24px;
+  background-size: 100%;
+  cursor: pointer;
+}
+
+div.dialog .title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+div.dialog .segment {
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+div.dialog .flex-segment {
+  text-align: left;
+  margin-bottom: 4px;  
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-flow: row;
+  -webkit-flex-flow: row;  
+  flex-flow: row;
+}
+
+div.dialog .field {
+  min-width: 80px;
+}
+
+div.dialog .input {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  flex: 1;
+  min-width: 100px;
+  width: 100%;
+}
+
+/* Channel */
+div.channel-dialog {
+  height: 360px;
+  top: 50%;
+  margin-top: -180px;
+}
+
+div.channel-dialog .controls {
+  
+}
+
+div.channel-dialog .controls .btn {
+  float: left;
+  margin-right: 4px;
+}
+
+/* Player */
+
+div.player {
+  width: 260px;
+  left: 50vw;
+  margin-left: -130px;
+  height: 346px;
+  top: 50vh;
+  margin-top: -178px;
+}
+
+div.player .caption {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 16px;
+  border-bottom: 1px dotted #999;
+  margin-bottom: 20px;
+}
+
+div.player .segment {
+  text-align: center;
+}
+
+div.player .range-input {
+  width: 180px;
+  left: 50%;
+  position: relative;
+  margin-left: -90px;
+}
+
+div.player .control-btn {
+  width: 120px;
+}
+
+/* Overrides */
+
+a[data-toggle="collapse"] {
+  position: relative;
+}
+
+a[aria-expanded="false"]::before, a[aria-expanded="true"]::before {
+  content: '\e259';
+  display: block;
+  position: absolute;
+  right: 20px;
+  font-family: 'Glyphicons Halflings';
+  font-size: 0.6em;
+}
+
+a[aria-expanded="true"]::before {
+  content: '\e260';
+}
