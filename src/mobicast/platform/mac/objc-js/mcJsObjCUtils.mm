@@ -12,33 +12,14 @@
 {
     JSValue *jsVal = [obj JSValue];
     MC_ASSERT([jsVal isArray] == TRUE);
-    
-    NSUInteger count = [[obj valueForKey:@"length"] integerValue];
+    return [jsVal toArray];
+}
 
-    NSMutableArray *array = [NSMutableArray arrayWithCapacity:count];
-    
-    for (unsigned i = 0; i < count; i++)
-    {
-        id elemValue = [obj webScriptValueAtIndex:i];
-    
-        if([elemValue isKindOfClass:[WebScriptObject class]])
-        {
-            JSValue *elemJsVal = [elemValue JSValue];
-            
-            if([elemJsVal isArray])
-            {
-                elemValue = [MCJsObjCUtils js2objcArray:elemValue];
-            }
-            else
-            {
-                MC_ASSERT(false);
-            }
-        }
-        
-        [array addObject:elemValue];
-    }
-    
-    return array;
++ (NSDictionary *)js2objcDictionary:(WebScriptObject *)obj
+{
+    JSValue *jsVal = [obj JSValue];
+    MC_ASSERT([jsVal isObject] == TRUE);
+    return [jsVal toDictionary];
 }
 
 @end

@@ -14,7 +14,10 @@
 
 // Converts JS array to NSArray.
 + (NSArray *)js2objcArray:(WebScriptObject *)obj;
-    
+
+// Converts JS object to NSDictionary.
++ (NSDictionary *)js2objcDictionary:(WebScriptObject *)obj;
+
 @end
 
 #endif // !__MOBICAST_PLATFORM_MAC_JS_OBJC_UTILS_H__
