@@ -8,6 +8,7 @@
 #include <mobicast/mcTypes.h>
 #include <string>
 #include <list>
+#include <vector>
 
 namespace MobiCast
 {
@@ -64,6 +65,8 @@ private:
 class HtmlStrainer
 {
 public:
+    HtmlStrainer();
+
     /** Initializes with <start> and <end> tags. */
     void Init(const char *start, const char *end);
 
@@ -83,7 +86,7 @@ public:
     inline void SetRepeat(bool repeat) { _repeat = repeat; }
 
     /** Returns the list of collected texts. */
-    inline const std::list<std::string> &GetTexts() const { return _texts; }
+    inline const std::vector<std::string> &GetTexts() const { return _texts; }
 
     /** Resets the state for a new match without clearing the collected data. */
     void Reset();
@@ -102,7 +105,7 @@ private:
     MatchStr _endTag;
     bool _repeat;
     std::string _text;
-    std::list<std::string> _texts;
+    std::vector<std::string> _texts;
 };
 
 } // MobiCast namespace
