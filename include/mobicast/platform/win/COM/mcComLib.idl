@@ -107,6 +107,8 @@ library LIBMobiCast
         [propget] HRESULT mediaSource([out, retval] BSTR *pRetVal);
         [propget] HRESULT keywords([out, retval] BSTR *pRetVal);
         [propget] HRESULT filter([out, retval] _MediaFilter **pRetVal);
+
+        HRESULT execute([in] BSTR url, [in] VARIANT contentTags, [in] BSTR callbackFn, [in] VARIANT context);
     };
 
     // _Channel COM interface
@@ -133,8 +135,6 @@ library LIBMobiCast
                              [out, retval] _MediaSearch **ppRetVal);
 
         HRESULT addChannel([in] BSTR title, [in] VARIANT searches, [out, retval] BSTR *pRetVal);
-
-        HRESULT listChannel([in] BSTR channelId, [out, retval] VARIANT *pRetVal);
 
         HRESULT deleteChannel([in] BSTR channelId, [out, retval] VARIANT_BOOL *pRetVal);
 

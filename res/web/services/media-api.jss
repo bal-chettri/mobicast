@@ -4,45 +4,6 @@
  * Copyright (C) 2018  Bal Chettri
  * Licensed under GNU GPL(https://www.gnu.org/licenses/gpl.html)
  */
-/*
-Media management APIs
-
-API: Get plugins
-URL: media-apis.jss?cmd=get_plugins
-
-API: Get channels
-URL: media-apis.jss?cmd=get_channels
-
-API: Get channel
-URL: media-apis.jss?cmd=get_channel&channel_id=id
-
-API: Add channel
-URL: media-apis.jss?cmd=add_channel
-POST:
-{
-    "title": "New channel title",
-    "searches": [
-        {
-            "source": "mc.plugin.yt",
-            "keywords": [
-                "songs",
-                "videos"
-            ],
-            "filters": {
-                "size": 1024,
-                "date-range": "start-end",
-                "subtitles": true,
-                "type": "image",
-                "quality": "320dpi",
-                "max": 100
-            }
-        }
-    ]
-}
-
-API: List channel
-URL: media-api.jss?cmd=list_channel&channel_id=id
-*/
 
 //
 // GetPluginsAPI.
@@ -64,7 +25,7 @@ var GetPluginsAPI = {
     return true;
   },
   
-  _pluginMetaObject: function(pluginItem) {    
+  _pluginMetaObject: function(pluginItem) {
     var pm = pluginItem.meta;
     var plugin = pluginItem.plugin;
     
@@ -106,7 +67,7 @@ var GetPluginsAPI = {
 //
 var GetChannelAPI = {
   main: function(_req, qs) {
-    var channelId = qsGet(qs, 'channel_id');    
+    var channelId = qsGet(qs, 'channel_id');
     var result;
     
     if(channelId == undefined) {
@@ -125,7 +86,7 @@ var GetChannelAPI = {
         result = {
           'status': 'success'
         };
-        result['channel'] = this._channelToObject(channel);          
+        result['channel'] = this._channelToObject(channel);
       }
     }
     
@@ -160,9 +121,9 @@ var GetChannelAPI = {
   _filterToObject: function(filter) {
     var fo = { };
     if(filter != undefined) {
-      fo[MC.kPluginMediaSearchFilterType] = filter.size;          
+      fo[MC.kPluginMediaSearchFilterType] = filter.size;
       fo[MC.kPluginMediaSearchFilterDateRange] = filter.dateRange;
-      fo[MC.kPluginMediaSearchFilterSubtitles] = filter.subtitles,      
+      fo[MC.kPluginMediaSearchFilterSubtitles] = filter.subtitles,
       fo[MC.kPluginMediaSearchFilterQuality] = filter.quality;
       fo[MC.kPluginMediaSearchFilterMax] = filter.max;
     }    
@@ -354,41 +315,37 @@ var ListChannelAPI = {
       _req.replyText(200, JSON.stringify(this._errorResult('Invalid channel JSON.')), "application/json");
       return;
     }
-        
-    var result;
-    var items = MC.mm.listChannel(channelId);    
     
-    if(items == undefined) {
-      result = this._errorResult('No media items.')
-    } else {
-      var result = {
-        'status': 'success',
-        'channel': {
-          'id': channelId
-        },
-        'items': []
-      };
-      items = MC.toJsArray(items);
-      
-      for(var i in items) {
-        result.items.push(this._MediaToObject(items[i]));
+    var channel = MC.mm.getChannel(channelId);
+    if(channel == undefined || channel == null) {
+      _req.replyText(200, JSON.stringify(this._errorResult('Invalid channel id.')), "application/json");
+    }
+    
+    var mediaItems = [];
+    
+    var searches = MC.toJsArray(channel.searches);
+    for(var i in searches) {
+      var search = searches[i];
+      var pinfo = MC.findPlugin(search.mediaSource);
+      if(pinfo != null && pinfo.plugin != undefined) {
+        var mediaSource = pinfo.plugin.getMediaSource();
+        if(mediaSource != null) {
+          var items = mediaSource.search(search);
+          mediaItems = mediaItems.concat(items);
+        }
       }
     }
     
+    var result = {
+      'status': 'success',
+      'channel': {
+        'id': channelId
+      },
+      'items': mediaItems
+    };
+    
     _req.replyText(200, JSON.stringify(result), "application/json");
     return true;
-  },
-  
-  _MediaToObject: function(media) {
-    var media = {
-      'type': media.type,
-      'title': media.title,
-      'mediaUrl': media.mediaUrl,
-      'thumbnailUrl': media.thumbnailUrl,
-      'duration': media.duration,
-      'format': media.format
-    };
-    return media;
   },
   
   _errorResult: function(msg) {

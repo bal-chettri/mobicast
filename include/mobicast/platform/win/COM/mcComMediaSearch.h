@@ -6,6 +6,7 @@
 #define __MOBICAST_PLATFORM_WIN_MEDIA_SEARCH_H__
 
 #include <mobicast/platform/win/COM/mcComBase.h>
+#include <mobicast/platform/win/COM/mcComJs.h>
 #include <mobicast/platform/win/COM/mcComMediaFilter.h>
 #include <mobicast/mcHtmlStrainer.h>
 #include <mcComLib_i.h>
@@ -34,6 +35,8 @@ public:
     STDMETHODIMP get_keywords(BSTR *pRetVal);
     STDMETHODIMP get_filter(_MediaFilter **pRetVal);
 
+    STDMETHODIMP execute(BSTR url, VARIANT contentTags, BSTR jsCallback, VARIANT jsContext);
+
     // Public internal methods not exposed to COM.
 
     inline BSTR GetId() const { return _id; }
@@ -49,21 +52,8 @@ public:
         return strFilters;
     }
 
-    /** Performs the search and appends the result to `mediaList` object. */
-    bool Perform(std::list<CMedia *> &mediaList);
-
 private:
-    /** Gets the search URL from the plugin's media source. */
-    bool GetSearchUrl(VARIANT &bstrUrl);
-
-    /** Gets the media extraction tags array from the plugin's media source. */
-    bool GetMediaExtractionTags(VARIANT &varMediaTags);
-
-    /** Notifies the plugin's media source about the media item found as a result of search. */
-    void NotifyMediaItem(_Media *pMedia);
-
-    /** Initializes HTML strainer for a media field before a search. */
-    bool InitStrainer(VARIANT &varFieldTags, HtmlStrainer &expr);
+    bool InitStrainer(CJsValue &varFieldTags, HtmlStrainer &expr);
 
     /** Performs a web search for media items. */
     bool PerformSearch(BSTR bstrSearchUrl, MediaSearchContext *pContext);

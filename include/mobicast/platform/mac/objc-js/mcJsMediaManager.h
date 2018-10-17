@@ -26,7 +26,6 @@
 - (MCJSMediaSearch *)createSearchWithMediaSource:(NSString *)source keywords:(NSString *)keywords filter:(MCJSMediaFilter *)filter;
 
 - (NSString *)addChannelWithTitle:(NSString *)title searches:(NSArray *)searches;
-- (NSArray *)listChannelById:(NSString *)channelId;
 - (BOOL)deleteChannelById:(NSString *)channelId;
 - (void)registerMediaHandler:(NSString *)format plugin:(NSString *)pluginId;
 - (NSArray *)listMediaHandlers;

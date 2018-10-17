@@ -9,6 +9,7 @@
 #include <mobicast/platform/win/mcWindow.h>
 #include <mobicast/mcDebug.h>
 #include <curl/curl.h>
+#include <map>
 
 extern MobiCast::Window *g_window;
 
@@ -27,22 +28,12 @@ const IID *CMediaSearch_IIDs[] =
 // MediaSearchContext struct.
 // MediaSearchContext struct contains contextual data for a single search operation.
 //
+
 struct MediaSearchContext
 {
-    // Media list where to append the search results.
-    std::list<CMedia *> *pMediaList;
-
-    // Filter for media content url.
-    HtmlStrainer *pExprMediaUrl;
-
-    // Filter for media thumbnail url.
-    HtmlStrainer *pExprThumbnail;
-
-    // Filter for media duration.
-    HtmlStrainer *pExprDuration;
-
-    // Filter for media title.
-    HtmlStrainer *pExprTitle;
+    BSTR jsCallback;
+    VARIANT jsContext;
+    std::map<HtmlStrainer *, std::string> htmlFilters;
 };
 
 //
@@ -102,153 +93,85 @@ STDMETHODIMP CMediaSearch::get_filter(_MediaFilter **ppRetVal)
     return S_OK;
 }
 
-bool CMediaSearch::Perform(std::list<CMedia *> &mediaList)
+STDMETHODIMP CMediaSearch::execute(BSTR url, VARIANT contentTags, BSTR jsCallback, VARIANT jsContext)
 {
-    // Get search URL from the plugin.
-    VARIANT bstrSearchUrl;
-    if(!GetSearchUrl(bstrSearchUrl)) {
-        return false;
-    }
+    COM_CHECK_ARG(url);
+    COM_CHECK_ARG(jsCallback);
 
-    // Get media extraction tags from the plugin.
-    VARIANT varMediaTags;
-    if(!GetMediaExtractionTags(varMediaTags)) {
-        VariantClear(&bstrSearchUrl);
-        return false;
-    }
+    MC_LOGD("CMediaSearch::execute");
 
-    // Get media tags array for each field to extract. Media tags must have this format:
-    // [ videoUrlTags, thumbnailTags, durationTags, titleTags ]
-    VARIANT *pMediaTags = NULL;
-    SafeArrayAccessData(varMediaTags.parray, reinterpret_cast<void **>(&pMediaTags));
+    COM_CHECK_ARG(contentTags.vt == VT_DISPATCH);
+    CJsValue jsContentTags(contentTags);
 
-    // Initialize strainers to extract media fields from search response.
-    HtmlStrainer matchExprs[4];
-    for(int i = 0; i < sizeof(matchExprs) / sizeof(matchExprs[0]); i++)
+    MC_ASSERT(jsContentTags.IsObject());
+    jsContentTags.PrefetchKeyValues();
+
+    MediaSearchContext searchContext;
+    searchContext.jsCallback = jsCallback;
+
+    VariantInit(&searchContext.jsContext);
+    VariantCopy(&searchContext.jsContext, &jsContext);
+
+    const CJsValue::KeyValueMap &keyValues = jsContentTags.GetKeyValueMap();
+    for(CJsValue::KeyValueMap::const_iterator it = keyValues.begin();
+        it != keyValues.end();
+        ++it)
     {
-        if(!InitStrainer(pMediaTags[i], matchExprs[i]))
-        {
-            VariantClear(&varMediaTags);
-            VariantClear(&bstrSearchUrl);
+        const std::string &strFieldName = it->first;
+        CJsValue arrTags(it->second);
+
+        HtmlStrainer *pHtmlStrainer = new HtmlStrainer();
+        if(!InitStrainer(arrTags, *pHtmlStrainer)) {
+            delete pHtmlStrainer;
             return false;
         }
+        searchContext.htmlFilters[pHtmlStrainer] = strFieldName;
     }
-
-    VariantClear(&varMediaTags);
-
-    // Build context for performing the search.
-    MediaSearchContext context;
-    context.pMediaList = &mediaList;
-    context.pExprMediaUrl = matchExprs + 0;
-    context.pExprThumbnail = matchExprs + 1;
-    context.pExprDuration = matchExprs + 2;
-    context.pExprTitle = matchExprs + 3;
 
     // Finally, perform the search using search url and context.
-    bool ret = PerformSearch(bstrSearchUrl.bstrVal, &context);
+    bool searchStatus = PerformSearch(url, &searchContext);
 
-    VariantClear(&bstrSearchUrl);
-
-    return ret;
-}
-
-bool CMediaSearch::GetSearchUrl(VARIANT &bstrUrl)
-{
-    VariantInit(&bstrUrl);
-
-    VARIANT args[3];
-    args[2].vt = VT_BSTR;
-    args[2].bstrVal = _source;
-    args[1].vt = VT_BSTR;
-    args[1].bstrVal = _keywords;
-    args[0].vt = VT_DISPATCH;
-    args[0].pdispVal = _filter;
-
-    bool invokeStatus = g_window->GetBrowser()->InvokeMethod(
-        L"_mc_js_plugin_get_search_url", args, 3, bstrUrl);
-
-    MC_ASSERT(invokeStatus);
-
-    if(bstrUrl.vt != VT_BSTR) {
-        VariantClear(&bstrUrl);
-        return false;
+    for(std::map<HtmlStrainer *, std::string>::iterator it = searchContext.htmlFilters.begin(); 
+        it != searchContext.htmlFilters.end();
+        ++it)
+    {
+        delete it->first;
     }
 
-    return true;
-}
+    VariantClear(&searchContext.jsContext);
 
-bool CMediaSearch::GetMediaExtractionTags(VARIANT &varMediaTags)
-{
-    VariantInit(&varMediaTags);
-
-    VARIANT args[1];
-    args[0].vt = VT_BSTR;
-    args[0].bstrVal = _source;
-
-    bool invokeStatus = g_window->GetBrowser()->InvokeMethod(
-        L"_mc_js_plugin_get_media_extraction_tags", args, 1, varMediaTags);
-
-    MC_ASSERT(invokeStatus);
-
-    if(varMediaTags.vt != (VT_ARRAY | VT_VARIANT) || SafeArrayGetDim(varMediaTags.parray) != 1) {
-        VariantClear(&varMediaTags);
-        return false;
+    if(searchStatus)
+    {
+        return S_OK;
     }
 
-    // Validate the dimensions of media tags array.
-    //
-    // A valid media tags array must have following structure starting at index 0:
-    // [ videoUrlTags:[], thumbnailTags:[], durationTags:[], titleTags:[] ]
-
-    LONG ldimMediaTags, udimMediaTags;
-    SafeArrayGetLBound(varMediaTags.parray, 1, &ldimMediaTags);
-    SafeArrayGetUBound(varMediaTags.parray, 1, &udimMediaTags);
-
-    if(ldimMediaTags != 0 || udimMediaTags != 3) {
-        VariantClear(&varMediaTags);
-        return false;
-    }
-
-    return true;
+    return S_FALSE;
 }
 
-void CMediaSearch::NotifyMediaItem(_Media *pMedia)
+bool CMediaSearch::InitStrainer(CJsValue &varFieldTags, HtmlStrainer &expr)
 {
-    VARIANT ret, args[2];
-
-    VariantInit(&ret);
-
-    args[1].vt = VT_BSTR;
-    args[1].bstrVal = _source;
-    args[0].vt = VT_DISPATCH;
-    args[0].pdispVal = pMedia;
-
-    bool invokeStatus = g_window->GetBrowser()->InvokeMethod(
-        L"_mc_js_plugin_on_media_item_found", args, 2, ret);
-
-    MC_ASSERT(invokeStatus);
-
-    VariantClear(&ret);
-}
-
-bool CMediaSearch::InitStrainer(VARIANT &varFieldTags, HtmlStrainer &expr)
-{
-    if(varFieldTags.vt != (VT_VARIANT | VT_ARRAY)) {
+    if(!varFieldTags.IsArray()) {
         MC_LOG_DEBUG("Invalid media FieldTags array.");
         return false;
     }
 
     std::list<std::string> listTags;
 
-    CComArray arrTags(varFieldTags.parray);
-    for(int i = 0; i < (int)arrTags.GetCount(); i++)
+    int length = varFieldTags.GetArrayLength();
+    varFieldTags.PrefetchKeyValues();
+
+    for(int i = 0; i < length; i++)
     {
-        if(arrTags[i].vt != VT_BSTR) {
+        char szIndex[10];
+        itoa(i, szIndex, 10);
+        CJsValue value = varFieldTags.GetValueForKey(szIndex);
+
+        if(!value.IsString()) {
             return false;
         }
 
-        BSTR2MBS tag(arrTags[i].bstrVal);
-        listTags.push_back((const char *)tag);
+        std::string strTag = value.StringValue();
+        listTags.push_back(strTag);
     }
 
     expr.Init(listTags);
@@ -271,6 +194,16 @@ bool CMediaSearch::PerformSearch(BSTR bstrSearchURL, MediaSearchContext *pContex
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &CMediaSearch::SearchWriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)pContext);
 
+#if 0
+    struct curl_slist *headers = NULL;
+    headers = curl_slist_append(headers, "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+    // headers = curl_slist_append(headers, "Accept-Encoding: gzip, deflate");
+    headers = curl_slist_append(headers, "Accept-Language: en-US,en;q=0.5");
+    headers = curl_slist_append(headers, "Upgrade-Insecure-Requests: 1");
+    headers = curl_slist_append(headers, "User-Agent: Mozilla/5.0 (Windows NT 6.1; rv:61.0) Gecko/20100101 Firefox/61.0");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+#endif
+
     CURLcode curlRet = curl_easy_perform(curl);
     curl_easy_cleanup(curl);
 
@@ -279,46 +212,50 @@ bool CMediaSearch::PerformSearch(BSTR bstrSearchURL, MediaSearchContext *pContex
         return false;
     }
 
-    // Get the filtered texts to populate the media list.
-    const std::list<std::string> &urlTexts = pContext->pExprMediaUrl->GetTexts();
-    const std::list<std::string> &thumbnailTexts = pContext->pExprThumbnail->GetTexts();
-    const std::list<std::string> &durationTexts = pContext->pExprDuration->GetTexts();
-    const std::list<std::string> &titleTexts = pContext->pExprTitle->GetTexts();
-
-    // Length of texts for each field must match with others.
-    size_t length = urlTexts.size();
-    if(length != thumbnailTexts.size() || length != durationTexts.size() || length != titleTexts.size()) {
-        MC_LOG_ERR("Invalid length of texts in one or more match expressions.");
-        return false;
+    int length;
+    std::map<HtmlStrainer *, std::string>::iterator it = pContext->htmlFilters.begin();
+    if(it == pContext->htmlFilters.end()) {
+        length = 0;
+    } else {
+        length = (int)it->first->GetTexts().size();
     }
 
-    // Iterate through texts to build media object.
-    std::list<std::string>::const_iterator itURL = urlTexts.begin();
-    std::list<std::string>::const_iterator itThumbnail = thumbnailTexts.begin();
-    std::list<std::string>::const_iterator itDuration = durationTexts.begin();
-    std::list<std::string>::const_iterator itTitle = titleTexts.begin();
-
-    while(itURL != urlTexts.end())
+    for(int index = 0; index < length; index++)
     {
-        // Create a Media object. References are transfered to the object so autoFree is false.
-        MBS2BSTR bstrTitle(itTitle->c_str(), false);
-        MBS2BSTR bstrMediaUrl(itURL->c_str(), false);
-        MBS2BSTR bstrThumbUrl(itThumbnail->c_str(), false);
-        MBS2BSTR bstrDuration(itDuration->c_str(), false);
+        for(std::map<HtmlStrainer *, std::string>::iterator it = pContext->htmlFilters.begin();
+            it != pContext->htmlFilters.end();
+            ++it)
+        {
+            HtmlStrainer *htmlFilter = it->first;
+            const std::string &tagName = it->second;
 
-        CMedia *pMedia = new CMedia(NULL, bstrTitle, bstrMediaUrl, bstrThumbUrl, bstrDuration, NULL);
+            const std::vector<std::string> &texts = htmlFilter->GetTexts();
+            MC_ASSERT(index < (int)texts.size());
 
-        // Tell the plugin's media source a media item was found. The source
-        // might want to update some properties of the media, like video url.
-        NotifyMediaItem(pMedia);
+            const std::string &text = texts.at(index);
 
-        // Append the media item to the media list.
-        pContext->pMediaList->push_back(pMedia);
+            MBS2BSTR bstrTagName(tagName.c_str());
+            MBS2BSTR bstrText(text.c_str());
 
-        ++itURL;
-        ++itThumbnail;
-        ++itDuration;
-        ++itTitle;
+            VARIANT args[3];
+            args[2].vt = VT_BSTR;
+            args[2].bstrVal = bstrTagName;
+            args[1].vt = VT_BSTR;
+            args[1].bstrVal = bstrText;
+            VariantInit(&args[0]);
+            VariantCopy(&args[0], &pContext->jsContext);
+    
+            VARIANT result;
+            VariantInit(&result);
+
+            bool invokeStatus = g_window->GetBrowser()->InvokeMethod(
+                pContext->jsCallback, args, 3, result);
+
+            VariantClear(&result);
+            VariantClear(&args[0]);
+
+            MC_ASSERT(invokeStatus);
+        }
     }
 
     return true;
@@ -329,10 +266,13 @@ size_t CMediaSearch::SearchWriteCallback(char* buf, size_t size, size_t nmemb, v
     MediaSearchContext *pContext = reinterpret_cast<MediaSearchContext *>(up);
 
     // Pour the buffer to media filters extracting the required texts.
-    pContext->pExprMediaUrl->Pour(buf, size * nmemb);
-    pContext->pExprThumbnail->Pour(buf, size * nmemb);
-    pContext->pExprDuration->Pour(buf, size * nmemb);
-    pContext->pExprTitle->Pour(buf, size * nmemb);
+    for(std::map<HtmlStrainer *, std::string>::iterator it = pContext->htmlFilters.begin(); 
+        it != pContext->htmlFilters.end();
+        ++it)
+    {
+        HtmlStrainer *htmlFilter = it->first;
+        htmlFilter->Pour(buf, size * nmemb);
+    }
 
     return size * nmemb;
 }

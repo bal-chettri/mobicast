@@ -23,9 +23,11 @@
 @property (nonatomic) NSString *keywords;
 @property (nonatomic) MCJSMediaFilter *filter;
 
+// JS Methods
+- (void)executeWithUrl:(NSString *)url contentTags:(WebScriptObject *)tags jsCallback:(NSString *)callback jsContext:(WebScriptObject *)context;
+
 // Internal methods not exposed to JS
 - (NSString *)filterAsString;
-- (BOOL)perform:(NSMutableArray<MCJSMedia *> *)mediaList;
 
 @end
 

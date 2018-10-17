@@ -32,7 +32,6 @@ public:
     STDMETHODIMP createSearch(BSTR source, BSTR keywords, IDispatch *pFilter,
                               _MediaSearch **ppRetVal);
     STDMETHODIMP addChannel(BSTR title, VARIANT searches, BSTR *pRetVal);
-    STDMETHODIMP listChannel(BSTR channelId, VARIANT *pRetVal);
     STDMETHODIMP deleteChannel(BSTR channelId, VARIANT_BOOL *pRetVal);
 
     STDMETHODIMP registerMediaHandler(BSTR format, BSTR pluginId);

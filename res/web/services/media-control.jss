@@ -4,31 +4,6 @@
  * Copyright (C) 2018  Bal Chettri
  * Licensed under GNU GPL(https://www.gnu.org/licenses/gpl.html)
  */
-/*
-Media control APIs
-
-API: Play media
-URL: media-control.jss?cmd=play_media
-POST:
-{
-    "mediaUrl": "content-url",
-    "format": "media-format",
-    "player": "plugin-id",
-    "registerPlayer": boolean
-}
-
-API: Pause media
-URL: media-control.jss?cmd=pause_media
-
-API: Rewind media
-URL: media-control.jss?cmd=rewind_media
-
-API: Volume control
-URL: media-control.jss?cmd=vol_up
-URL: media-control.jss?cmd=vol_down
-URL: media-control.jss?cmd=vol_mute
-URL: media-control.jss?cmd=vol_unmute
-*/
 
 //
 // PlayMediaAPI.

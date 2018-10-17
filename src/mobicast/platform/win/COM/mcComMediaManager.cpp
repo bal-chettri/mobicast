@@ -227,49 +227,6 @@ STDMETHODIMP CMediaManager::addChannel(BSTR title, VARIANT searches, BSTR *pRetV
     return S_OK;
 }
 
-STDMETHODIMP CMediaManager::listChannel(BSTR channelId, VARIANT *pRetVal)
-{
-    COM_CHECK_ARG(channelId)
-    COM_CHECK_PTR(pRetVal)
-
-    // Get the channel object.
-    _Channel *pChannel;
-    HRESULT hr = getChannel(channelId, &pChannel);
-    if(FAILED(hr) || pChannel == NULL) {
-        return hr;
-    }
-
-    // List of media to return as a result of channel search.
-    std::list<CMedia *> mediaList;
-
-    // Perform all searches in the channel.
-    const std::list<_MediaSearch *> &searches = static_cast<CChannel *>(pChannel)->GetSearches();
-    for(std::list<_MediaSearch *>::const_iterator it = searches.begin(); it != searches.end(); ++it)
-    {
-        CMediaSearch *pSearch = static_cast<CMediaSearch *>(*it);
-        pSearch->Perform(mediaList);
-    }
-
-    pChannel->Release();
-
-    // Return array of _Media items as SAFEARRAY.
-    SAFEARRAY *psaMediaItems = MediaListToSafeArray(mediaList);
-
-    if(psaMediaItems == NULL)
-    {
-        // Release local references in mediaList.
-        for(std::list<CMedia *>::const_iterator it = mediaList.begin(); it != mediaList.end(); ++it) {
-            (*it)->Release();
-        }
-        return E_OUTOFMEMORY;
-    }
-
-    pRetVal->vt = VT_ARRAY | VT_VARIANT;
-    pRetVal->parray = psaMediaItems;
-
-    return S_OK;
-}
-
 STDMETHODIMP CMediaManager::deleteChannel(BSTR channelId, VARIANT_BOOL *pRetVal)
 {
     COM_CHECK_ARG(channelId)

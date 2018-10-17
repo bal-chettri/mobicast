@@ -8,29 +8,28 @@
 #include <mobicast/mcHtmlStrainer.h>
 #include <mobicast/mcDebug.h>
 #include <curl/curl.h>
+#include <map>
 
 #pragma mark MCJSMediaSearchContext class
 
 @interface MCJSMediaSearchContext : NSObject
 {
 @public
-    NSMutableArray<MCJSMedia *> *mediaList;
-    MobiCast::HtmlStrainer *pHtmlStrainerMediaUrl;
-    MobiCast::HtmlStrainer *pHtmlStrainerThumbnail;
-    MobiCast::HtmlStrainer *pHtmlStrainerDuration;
-    MobiCast::HtmlStrainer *pHtmlStrainerTitle;
+    NSString *jsCallback;
+    WebScriptObject *jsContext;
+    std::map<MobiCast::HtmlStrainer *, std::string> htmlFilters;
 }
-- (instancetype)initWithMediaListArray:(NSMutableArray<MCJSMedia *> *)mediaList;
+- (instancetype)initWithJsCallback:(NSString *)callback andJsContext:(WebScriptObject *)context;
 @end
 
 @implementation MCJSMediaSearchContext
 
-- (instancetype)initWithMediaListArray:(NSMutableArray<MCJSMedia *> *)mediaList
+- (instancetype)initWithJsCallback:(NSString *)callback andJsContext:(WebScriptObject *)context
 {
     if((self = [super init]))
     {
-        self->mediaList = mediaList;
-        MC_ASSERT(self->mediaList != nil);
+        self->jsCallback = callback;
+        self->jsContext = context;
     }
     return self;
 }
@@ -40,9 +39,6 @@
 #pragma mark MCJSMediaSearch class
 
 @interface MCJSMediaSearch()
-- (NSString *)getSearchUrl;
-- (NSArray *)getMediaExtractionTags;
-- (void)notifyMediaItem:(MCJSMedia *)media;
 - (BOOL)initHtmlStrainer:(MobiCast::HtmlStrainer &)strainer withMediaTags:(NSArray *)varMediaTags;
 - (BOOL)performSearchWithUrl:(NSString *)url andContext:(MCJSMediaSearchContext *)context;
 @end
@@ -71,6 +67,51 @@
 @synthesize keywords;
 @synthesize filter;
 
+#pragma mark JS methods
+
+- (void)executeWithUrl:(NSString *)url contentTags:(WebScriptObject *)tags jsCallback:(NSString *)callback jsContext:(WebScriptObject *)context
+{
+    if(url == nil) {
+        return;
+    }
+    if(callback == nil) {
+        return;
+    }
+    if(tags == nil) {
+        return;
+    }
+    
+    NSDictionary *dictTags = [MCJsObjCUtils js2objcDictionary:tags];
+    
+    MCJSMediaSearchContext *searchContext = [[MCJSMediaSearchContext alloc] initWithJsCallback:callback andJsContext:context];
+    
+    BOOL validTags = YES;
+    for(NSString *strFieldName in dictTags) {
+        NSArray *arrTags = [dictTags valueForKey:strFieldName];
+        
+        MobiCast::HtmlStrainer *pHtmlStrainer = new MobiCast::HtmlStrainer();
+        if([self initHtmlStrainer:*pHtmlStrainer withMediaTags:arrTags] == NO) {
+            delete pHtmlStrainer;
+            validTags = NO;
+            break;
+        }
+        searchContext->htmlFilters[pHtmlStrainer] = std::string([strFieldName UTF8String]);
+    }
+    
+    if(validTags)
+    {
+        // Finally, perform the search using search url and context.
+        [self performSearchWithUrl:url andContext:searchContext];
+    }
+    
+    for(std::map<MobiCast::HtmlStrainer *, std::string>::iterator it = searchContext->htmlFilters.begin(); 
+        it != searchContext->htmlFilters.end();
+        ++it)
+    {
+        delete it->first;
+    }
+}
+
 #pragma mark Internal methods
 
 - (NSString *)filterAsString
@@ -82,78 +123,7 @@
     return @"";
 }
 
-- (BOOL)perform:(NSMutableArray<MCJSMedia *> *)mediaList
-{    
-    // Get search URL from the plugin.
-    NSString *searchUrl = [self getSearchUrl];
-    if(searchUrl == nil) {
-        return NO;
-    }
-    
-    // Get media extraction tags from the plugin. Media tags must have this format:
-    // [ mediaUrlTags, thumbnailTags, durationTags, titleTags ]
-    NSArray *varMediaTags = [self getMediaExtractionTags];
-    if(varMediaTags == nil) {
-        return NO;
-    }
-    
-    // Build match expressions to extract media items.
-    MobiCast::HtmlStrainer htmlStrainers[4];
-    for(int i = 0; i < sizeof(htmlStrainers) / sizeof(htmlStrainers[0]); i++) {
-        if(![self initHtmlStrainer:htmlStrainers[i] withMediaTags:[varMediaTags objectAtIndex:i]]) {
-            return NO;
-        }
-    }
-    
-    // Build context for searching media items from web search response.
-    MCJSMediaSearchContext *context = [[MCJSMediaSearchContext alloc] initWithMediaListArray:mediaList];
-    context->pHtmlStrainerMediaUrl = htmlStrainers + 0;
-    context->pHtmlStrainerThumbnail = htmlStrainers + 1;
-    context->pHtmlStrainerDuration = htmlStrainers + 2;
-    context->pHtmlStrainerTitle = htmlStrainers + 3;
-    
-    // Search for media using the media search URL.
-    return [self performSearchWithUrl:searchUrl andContext:context];
-}
-
 #pragma mark Private methods
-
-- (NSString *)getSearchUrl
-{
-    NSString *searchURL;
-    BOOL status = [[MCAppDelegate instance].webview invokeMethod:@"_mc_js_plugin_get_search_url"
-                                                      withParams:@[mediaSource, keywords, filter]
-                                                     returnValue:&searchURL];
-    MC_ASSERT(status == YES);
-    
-    if(searchURL == nil || ![searchURL isKindOfClass:[NSString class]]) {
-        return nil;
-    }
-    return searchURL;
-}
-
-- (NSArray *)getMediaExtractionTags
-{
-    WebScriptObject *varMediaTags_;
-    BOOL status = [[MCAppDelegate instance].webview invokeMethod:@"_mc_js_plugin_get_media_extraction_tags"
-                                                      withParams:@[mediaSource]
-                                                     returnValue:&varMediaTags_];
-    MC_ASSERT(status == YES);
-    
-    NSArray *varMediaTags = [MCJsObjCUtils js2objcArray:varMediaTags_];
-    if(varMediaTags == nil || ![varMediaTags isKindOfClass:[NSArray class]] || [varMediaTags count] != 4) {
-        return nil;
-    }
-    return varMediaTags;
-}
-
-- (void)notifyMediaItem:(MCJSMedia *)media
-{
-    BOOL status = [[MCAppDelegate instance].webview invokeMethod:@"_mc_js_plugin_on_media_item_found"
-                                                      withParams:@[mediaSource, media]
-                                                     returnValue:nil];
-    MC_ASSERT(status);
-}
 
 - (BOOL)initHtmlStrainer:(MobiCast::HtmlStrainer &)strainer withMediaTags:(NSArray *)varMediaTags
 {
@@ -182,11 +152,15 @@ static size_t SearchMediaWriteCallback(char* buf, size_t size, size_t nmemb, voi
 {
     MCJSMediaSearchContext *context = (__bridge MCJSMediaSearchContext *)up;
     
-    context->pHtmlStrainerMediaUrl->Pour(buf, size * nmemb);
-    context->pHtmlStrainerThumbnail->Pour(buf, size * nmemb);
-    context->pHtmlStrainerDuration->Pour(buf, size * nmemb);
-    context->pHtmlStrainerTitle->Pour(buf, size * nmemb);
-    
+    // Pour the buffer to media filters extracting the required texts.
+    for(std::map<MobiCast::HtmlStrainer *, std::string>::iterator it = context->htmlFilters.begin(); 
+        it != context->htmlFilters.end();
+        ++it)
+    {
+        MobiCast::HtmlStrainer *htmlFilter = it->first;
+        htmlFilter->Pour(buf, size * nmemb);
+    }
+
     return size * nmemb;
 }
 
@@ -203,6 +177,16 @@ static size_t SearchMediaWriteCallback(char* buf, size_t size, size_t nmemb, voi
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &SearchMediaWriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (__bridge void *)context);
     
+#if 0
+    struct curl_slist *headers = NULL;
+    headers = curl_slist_append(headers, "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+    // headers = curl_slist_append(headers, "Accept-Encoding: gzip, deflate");
+    headers = curl_slist_append(headers, "Accept-Language: en-US,en;q=0.5");
+    headers = curl_slist_append(headers, "Upgrade-Insecure-Requests: 1");
+    headers = curl_slist_append(headers, "User-Agent: Mozilla/5.0 (Windows NT 6.1; rv:61.0) Gecko/20100101 Firefox/61.0");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+#endif
+
     CURLcode curlRet = curl_easy_perform(curl);
     curl_easy_cleanup(curl);
     if(curlRet != CURLE_OK) {
@@ -210,49 +194,36 @@ static size_t SearchMediaWriteCallback(char* buf, size_t size, size_t nmemb, voi
         return NO;
     }
     
-    // Get the filtered texts to populate the media list.
-    const std::list<std::string> &urlTexts = context->pHtmlStrainerMediaUrl->GetTexts();
-    const std::list<std::string> &thumbnailTexts = context->pHtmlStrainerThumbnail->GetTexts();
-    const std::list<std::string> &durationTexts = context->pHtmlStrainerDuration->GetTexts();
-    const std::list<std::string> &titleTexts = context->pHtmlStrainerTitle->GetTexts();
-    
-    // Length of texts for each field must match with others.
-    size_t length = urlTexts.size();
-    if(length != thumbnailTexts.size() || length != durationTexts.size() || length != titleTexts.size()) {
-        MC_LOG_ERR("Invalid length of texts in one or more match expressions.");
-        return NO;
+    int length;
+    std::map<MobiCast::HtmlStrainer *, std::string>::iterator it = context->htmlFilters.begin();
+    if(it == context->htmlFilters.end()) {
+        length = 0;
+    } else {
+        length = (int)it->first->GetTexts().size();
     }
     
-    std::list<std::string>::const_iterator itUrl = urlTexts.begin();
-    std::list<std::string>::const_iterator itThumbnail = thumbnailTexts.begin();
-    std::list<std::string>::const_iterator itDuration = durationTexts.begin();
-    std::list<std::string>::const_iterator itTitle = titleTexts.begin();
-    
-    while(itUrl != urlTexts.end())
+    for(int index = 0; index < length; index++)
     {
-        // Create a CMedia object. References are transfered to the object so autoFree is false.
-        NSString *mediaUrl = [NSString stringWithUTF8String:itUrl->c_str()];
-        NSString *mediaTitle = [NSString stringWithUTF8String:itTitle->c_str()];
-        NSString *mediaThumbnailUrl = [NSString stringWithUTF8String:itThumbnail->c_str()];
-        NSString *mediaDuration = [NSString stringWithUTF8String:itDuration->c_str()];
-        
-        MCJSMedia *media = [[MCJSMedia alloc] initWithType:nil title:mediaTitle
-                                                  mediaUrl:mediaUrl
-                                              thumbnailUrl:mediaThumbnailUrl
-                                                  duration:mediaDuration
-                                                    format:nil];
-                
-        // Tell the plugin's media source a media item was found. The source
-        // might want to update some properties of the media, like video url.
-        [self notifyMediaItem:media];
-        
-        // Append the media item to the media list.
-        [context->mediaList addObject: media];
-        
-        ++itUrl;
-        ++itThumbnail;
-        ++itDuration;
-        ++itTitle;
+        for(std::map<MobiCast::HtmlStrainer *, std::string>::iterator it = context->htmlFilters.begin();
+            it != context->htmlFilters.end();
+            ++it)
+        {
+            MobiCast::HtmlStrainer *htmlFilter = it->first;
+            const std::string &tagName = it->second;
+            
+            const std::vector<std::string> &texts = htmlFilter->GetTexts();
+            MC_ASSERT(index < (int)texts.size());
+
+            const std::string &text = texts.at(index);
+
+            NSString *strTagName = [NSString stringWithUTF8String:tagName.c_str()];
+            NSString *strText = [NSString stringWithUTF8String:text.c_str()];
+            
+            BOOL status = [[MCAppDelegate instance].webview invokeMethod:context->jsCallback
+                                                       withParams:@[strTagName, strText, context->jsContext]
+                                                      returnValue:nil];
+            MC_ASSERT(status == YES);
+        }
     }
     
     return YES;
@@ -267,7 +238,9 @@ JS_EXPORT_PROPERTY("keywords", "keywords", keywords)
 JS_EXPORT_PROPERTY("filter", "filter", filter)
 JS_PROPERTY_END()
 
-JS_EMPTY_SELECTOR_MAP()
+JS_SELECTOR_MAP()
+JS_EXPORT_METHOD(executeWithUrl:contentTags:jsCallback:jsContext:, "execute")
+JS_SELECTOR_END()
 
 JS_EXPORT_CLASS()
 
