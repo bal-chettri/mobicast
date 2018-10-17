@@ -46,10 +46,10 @@ for excl in $EXCLUDES; do
     EXCLUDES_ALL="$EXCLUDES_ALL --exclude=$excl"
 done
 
-RSYNC_OPTIONS="$RSYNC_OPTIONS -vpr --delete $EXCLUDES_ALL"
+RSYNC_OPTIONS="-vprt --delete $EXCLUDES_ALL"
 
 echo [xcode-build-remote] Synching remote project at $REMOTE_HOST:$REMOTE_PATH
-# echo $RSYNC_OPTIONS -e ssh $LOCAL_PATH $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
+# echo rsync $RSYNC_OPTIONS -e ssh $LOCAL_PATH $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
 rsync $RSYNC_OPTIONS -e ssh $LOCAL_PATH $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH
 if [ $? -ne 0 ]; then
     echo [xcode-build-remote] rsync failed!
