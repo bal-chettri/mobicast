@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2018  Bal Chettri
+ * Licensed under GNU GPL(https://www.gnu.org/licenses/gpl.html)
+ */
 "use strict";
 
 var ApiFactory =
