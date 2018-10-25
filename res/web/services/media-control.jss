@@ -202,8 +202,8 @@ MC.registerService("/services/media-control.jss", function(_req, _resp) {
   try {
     MC.log('media-control.jss', 'Service invoked qs = ' + _req.rawQueryString);
 
-    var qs = parseQueryString(_req.rawQueryString);
-    var cmd = qsGet(qs, 'cmd');
+    var qs = HttpUtils.parseQueryString(_req.rawQueryString);
+    var cmd = qs.get('cmd');
 
     if(cmd == 'play_media')
     {

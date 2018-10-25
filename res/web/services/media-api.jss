@@ -67,7 +67,7 @@ var GetPluginsAPI = {
 //
 var GetChannelAPI = {
   main: function(_req, qs) {
-    var channelId = qsGet(qs, 'channel_id');
+    var channelId = qs.get('channel_id');
     var result;
     
     if(channelId == undefined) {
@@ -309,7 +309,7 @@ var AddChannelAPI = {
 //
 var ListChannelAPI = {
   main: function(_req, qs) {
-    var channelId = qsGet(qs, 'channel_id');
+    var channelId = qs.get('channel_id');
     
     if(channelId == undefined) {
       _req.replyText(200, JSON.stringify(this._errorResult('Invalid channel JSON.')), "application/json");
@@ -361,7 +361,7 @@ var ListChannelAPI = {
 //
 var DeleteChannelAPI = {
   main: function(_req, qs) {
-    var channelId = qsGet(qs, 'channel_id');
+    var channelId = qs.get('channel_id');
     var result;
     
     if(channelId == undefined) {
@@ -421,8 +421,8 @@ MC.registerService("/services/media-api.jss", function(_req, _resp) {
   try {
     MC.log('media-api.jss', 'Service invoked qs = ' + _req.rawQueryString);
 
-    var qs = parseQueryString(_req.rawQueryString);
-    var cmd = qsGet(qs, 'cmd');
+    var qs = HttpUtils.parseQueryString(_req.rawQueryString);
+    var cmd = qs.get('cmd');
 
     if(cmd == 'get_plugins')
     {

@@ -14,8 +14,8 @@ var PairPhoneAPI = {
     if(div == null || div == undefined) {
       _req.replyText(200, this._errorResult('Setup is not running.'), "application/json");
     } else {
-      var phone_id = qsGet(qs, 'id');
-      var phone_name = qsGet(qs, 'name');
+      var phone_id = qs.get('id');
+      var phone_name = qs.get('name');
       if(phone_id == null || phone_id.length == 0 ||
          phone_name == null || phone_name.length == 0)
       {
@@ -67,8 +67,8 @@ var ActivatePhoneAPI = {
     if(div == null || div == undefined) {
       _req.replyText(200, this._errorResult('Setup is not running.'), "application/json");
     } else {
-      var phoneId = qsGet(qs, 'id');
-      var passcode = qsGet(qs, 'code');
+      var phoneId = qs.get('id');
+      var passcode = qs.get('code');
       if(phoneId == null || phoneId.length == 0 || 
          passcode == null || passcode.length != 4)
       {
@@ -106,8 +106,8 @@ var ActivatePhoneAPI = {
 // Register service
 MC.registerService("/services/app.jss", function(_req, _resp) {
   try {
-    var qs = parseQueryString(_req.rawQueryString);
-    var cmd = qsGet(qs, 'cmd');
+    var qs = HttpUtils.parseQueryString(_req.rawQueryString);
+    var cmd = qs.get('cmd');
 
     if(cmd == 'pair_phone')
     {

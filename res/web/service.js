@@ -4,19 +4,22 @@
  * Copyright (C) 2018  Bal Chettri
  * Licensed under GNU GPL(https://www.gnu.org/licenses/gpl.html)
  */
-function parseQueryString(rqs) {
-  var items = rqs.split('&');
-  var qs = { };
-  for(i in items) {
-    var kv = items[i].split('=');
-    qs[kv[0]] = kv[1];
+var HttpUtils = {
+  parseQueryString: function(rqs) {
+    var items = rqs.split('&');
+    var qs = {
+      items: { },
+      get: function(key) {
+        return (key in this.items) ? this.items[key] : null;
+      }
+    };
+    for(i in items) {
+      var kv = items[i].split('=');
+      qs.items[kv[0]] = kv[1];
+    }
+    return qs;
   }
-  return qs;
-}
-
-function qsGet(qs, key) {
-  return (key in qs) ? qs[key] : null;
-}
+};
 
 var OBJECT = {
   isObject: function(v) {    
