@@ -580,7 +580,7 @@ class ChannelDialog extends Dialog
        }
     });
 
-    this.getItem('dropdown_source').on("shown.bs.dropdown", function() {
+    this.getItem('dropdown_source').on('shown.bs.dropdown', function() {
       $(this).find('#dropdown_source_list li a').on('click', function(sender) {
         if(self.curSearch >= 0) {
           let source = $(this).attr('id');
@@ -595,12 +595,7 @@ class ChannelDialog extends Dialog
     this.getItem('keywords').change(function() {
       if(self.curSearch >= 0) {
         var tempKeywords = $(this).val().split('\n');
-        var keywords = [];
-        tempKeywords.forEach((item) => {
-          if(item.match(self.regexKeyword) != null) {
-            keywords.push(item);
-          }
-        });
+        let keywords = tempKeywords.filter((item) => item.match(self.regexKeyword));
         $(this).val(keywords.join('\n'));
         self.data.searches[self.curSearch].keywords = keywords;
       }
@@ -655,7 +650,7 @@ class ChannelDialog extends Dialog
 
       let mediaSource = this._findMediaSource(search.source);
       let mediaSourceName = mediaSource == undefined ? '' : mediaSource.title;
-      this.getItem('dropdown_source_btn').html(mediaSourceName + '&nbsp;<span class="caret"></span>');
+      this.getItem('dropdown_source_btn').html(`${ mediaSourceName }&nbsp;<span class="caret"></span>`);
 
       this.getItem('keywords').val(search.keywords.join('\n'));
     }
@@ -685,10 +680,10 @@ class ChannelDialog extends Dialog
   {
     let html = '';
     if(this.mediaSources.length === 0) {
-      html = '<li class="disabled"><a href="#">No Source</a></li>';
+      html = `<li class="disabled"><a href="#">No Source</a></li>`;
     } else {
       for(let i in this.mediaSources) {
-        html+= '<li>' + '<a id="' + this.mediaSources[i].id + '" href="#">';
+        html+= `<li> <a id="${ this.mediaSources[i].id }" href="#">`;
         html+= this.mediaSources[i].title + '</a></li>';
       }
     }
@@ -862,15 +857,15 @@ class DataView extends View
         if(dsKey in data) {
           this.data = data[dsKey];
         } else {
-          console.log('Datasource key "' + dsKey + '" not found.');
+          console.log('Datasource key "${ dsKey }" not found.');
         }
       } else {
-        console.log('Request failed with error: "' + data.message + '".');
+        console.log('Request failed with error: "${ data.message }".');
       }
       console.log('Data = ' + JSON.stringify(data));
     } else {
       this.data = null;
-      console.log('Request failed with status: ' + textStatus);
+      console.log('Request failed with status: ${ textStatus }.');
     }
   }
 
@@ -890,10 +885,10 @@ class DataView extends View
   _buildHTML()
   {
     let html =
-    '<div class="view">' +
-    '<div class="content vlayout">';
+    `<div class="view">
+    <div class="content vlayout">`;
     if(this.data == null) {
-      html+= '<p>No data available.</p>'
+      html+= `<p>No data available.</p>`
     } else {
       for(let index = 0; index < this.data.length; index++) {
         html+= this._buildRowHTML(this.data[index], index);
@@ -903,7 +898,7 @@ class DataView extends View
         html+= endHtml;
       }
     }
-    html+= '</div></div>';
+    html+= `</div></div>`;
     return html;
   }
 
@@ -968,13 +963,13 @@ class MediaListView extends DataView
 
     let dropdown = $('.wrapper #content #main-content .dropdown');
 
-    dropdown.on("show.bs.dropdown", function() {
+    dropdown.on('show.bs.dropdown', function() {
       let mediaId = parseInt($(this).attr('id'));
       let list = self._getPlayerListHtml(self.data[mediaId].format);
       $(this).find('ul.dropdown-menu').html(list);
     });
 
-    dropdown.on("shown.bs.dropdown", function() {
+    dropdown.on('shown.bs.dropdown', function() {
       let mediaId = parseInt($(this).attr('id'));
       $(this).find('ul li a').on('click',function(sender) {
         let player = $(this).attr('id');
@@ -1019,21 +1014,21 @@ class MediaListView extends DataView
     let playerList = '';
     let players = this._getPlayers(format);
     if(players.length === 0) {
-      playerList = '<li class="disabled"><a href="#">No Player</a></li>';
+      playerList = `<li class="disabled"><a href="#">No Player</a></li>`;
     } else {
       let defaultIndex;
       for(let i in players) {
         if(players[i].id === this._getDefaultPlayer(format)) {
           defaultIndex = i;
         } else {
-          playerList+= '<li>' + '<a id="' + players[i].id + '" href="#">';
+          playerList+= `<li><a id="${ players[i].id }" href="#">`;
           playerList+= players[i].title + '</a></li>';
         }
       }
       if(defaultIndex != undefined) {
         let defaultPlayer =
-          '<li>' + '<a id="' + players[defaultIndex].id + '" href="#">' +
-          '<b>' + players[defaultIndex].title + '</b></a></li>';
+          `<li><a id="${ players[defaultIndex].id }" href="#">
+          <b>${ players[defaultIndex].title }</b></a></li>`;
           playerList = defaultPlayer + playerList;
       }
     }
