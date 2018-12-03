@@ -253,6 +253,16 @@ static void *_StartHttpService(void *param)
     g_httpService->Destroy();
     
     [self unpublishWebService];
+        
+    if(g_dbsqlite) {
+        delete g_dbsqlite;
+    }
+    if(g_pm) {
+        delete g_pm;
+    }
+    if(g_pJssHandler) {
+        delete g_pJssHandler;
+    }
 }
 
 #pragma mark MCWebViewDelegate
