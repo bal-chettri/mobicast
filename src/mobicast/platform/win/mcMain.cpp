@@ -38,6 +38,7 @@ static MobiCast::PluginManager *g_pm;
 static MobiCast::Database *g_dbsqlite;
 static http::Service *g_httpService;
 static char g_serviceTokenBuff[128];
+static std::string g_HttpSrvcPrimaryHostIP;
 
 // External variables.
 MobiCast::Window *g_window;
@@ -95,7 +96,12 @@ static void CALLBACK LoadIndexPage(HWND hWnd, UINT, UINT_PTR timerId, DWORD)
     KillTimer(g_window->GetHandle(), timerId);
 
     char szUrl[256];
-    strcpy(szUrl, "http://localhost");
+    strcpy(szUrl, "http://");
+    if(g_HttpSrvcPrimaryHostIP.empty()) {
+        strcat(szUrl, "localhost");
+    } else {
+        strcat(szUrl, g_HttpSrvcPrimaryHostIP.c_str());
+    }
     if(PORT != 80) {
         sprintf(szUrl + strlen(szUrl), ":%d", PORT);
     }
@@ -265,6 +271,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, int)
                     sprintf(host, "%s", it->ipv4.c_str());
                     hostNames.push_back(host);
                 }
+
+                // Set as primary host IP address for web service.
+                g_HttpSrvcPrimaryHostIP = it->ipv4;
             }
         }
 
@@ -287,6 +296,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, int)
         if(PORT == 80) {
             hostNames.push_back(ipv4);
         }
+
+        // Set as primary host IP address for web service.
+        g_HttpSrvcPrimaryHostIP = ipv4;
     }
 
     // Create a virtual http host with valid host names and index page.

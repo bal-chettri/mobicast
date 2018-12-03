@@ -2,6 +2,20 @@
   <tr>
     <td align="center">
       <h2>Mobicast</h2>
+      <div id="qrcontainer"><img id="qr" style="width:120px;height:120px;"></div>
     </td>
   </tr>
 </table>
+<script>
+(function genQRCode() {
+  var host = window.location.hostname;
+  var port = window.location.port;
+  var clientUrl = 'http://' + host;
+  if(port != 80) {
+    clientUrl = clientUrl + ':' + port;
+  }
+  clientUrl = clientUrl + '/client/index.html';
+  var getQRUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=120x120&chld=L|0&chl=' + encodeURI(clientUrl);
+  document.getElementById('qr').src = getQRUrl;
+})();
+</script>

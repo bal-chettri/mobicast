@@ -489,6 +489,8 @@ window.onload = function() {
     MC.log(_MODULE_, 'DEBUG = ' + (MC.DEBUG ? 'True' : 'False') + '\n\n');
     MC.log(_MODULE_,
       'System info:\n\n' +
+      'Hostname: ' + window.location.hostname + '<br />' +
+      'Port: ' + window.location.port + '<br />' +
       'Cookies: ' + navigator.cookieEnabled + '<br />' +
       'AppName:  ' + navigator.appName + '<br />' +
       'AppCodeName: ' + navigator.appCodeName + '<br />' +
