@@ -18,54 +18,54 @@ var ApiFactory =
     surl+= api;
     return surl;
   },
-
+  
   getPluginsUrl: function() {
-    return this._url('/services/media-api.jss?cmd=get_plugins');
+    return this._url(`/services/media-api.jss?cmd=get_plugins`);
   },
   listMediaHandlersUrl: function() {
-    return this._url('/services/media-api.jss?cmd=list_media_handlers');
+    return this._url(`/services/media-api.jss?cmd=list_media_handlers`);
   },
 
   getChannelsUrl: function() {
-    return this._url('/services/media-api.jss?cmd=get_channels');
+    return this._url(`/services/media-api.jss?cmd=get_channels`);
   },
   getChannelUrl: function(id) {
-    return this._url('/services/media-api.jss?cmd=get_channel&channel_id=' + id);
+    return this._url(`/services/media-api.jss?cmd=get_channel&channel_id=${id}`);
   },
   addChannelUrl:function() {
-    return this._url('/services/media-api.jss?cmd=add_channel');
+    return this._url(`/services/media-api.jss?cmd=add_channel`);
   },
   listChannelUrl: function(id) {
-    return this._url('/services/media-api.jss?cmd=list_channel&channel_id=' + id);
+    return this._url(`/services/media-api.jss?cmd=list_channel&channel_id=${id}`);
   },
   deleteChannelUrl: function(id) {
-    return this._url('/services/media-api.jss?cmd=delete_channel&channel_id=' + id);
+    return this._url(`/services/media-api.jss?cmd=delete_channel&channel_id=${id}`);
   },
 
   playMediaUrl: function() {
-    return this._url('/services/media-control.jss?cmd=play_media');
+    return this._url(`/services/media-control.jss?cmd=play_media`);
   },
   pauseMediaUrl: function() {
-    return this._url('/services/media-control.jss?cmd=pause_media');
+    return this._url(`/services/media-control.jss?cmd=pause_media`);
   },
   resumeMediaUrl: function() {
-    return this._url('/services/media-control.jss?cmd=resume_media');
+    return this._url(`/services/media-control.jss?cmd=resume_media`);
   },
   rewindMediaUrl: function() {
-    return this._url('/services/media-control.jss?cmd=rewind_media');
+    return this._url(`/services/media-control.jss?cmd=rewind_media`);
   },
 
   muteMediaUrl: function() {
-    return this._url('/services/media-control.jss?cmd=vol_mute');
+    return this._url(`/services/media-control.jss?cmd=vol_mute`);
   },
   unmuteMediaUrl: function() {
-    return this._url('/services/media-control.jss?cmd=vol_unmute');
+    return this._url(`/services/media-control.jss?cmd=vol_unmute`);
   },
   volStepUpUrl: function() {
-    return this._url('/services/media-control.jss?cmd=vol_up');
+    return this._url(`/services/media-control.jss?cmd=vol_up`);
   },
   volStepDownUrl: function() {
-    return this._url('/services/media-control.jss?cmd=vol_down');
+    return this._url(`/services/media-control.jss?cmd=vol_down`);
   }
 };
 
