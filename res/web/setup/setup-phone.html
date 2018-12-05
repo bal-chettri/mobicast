@@ -1,21 +1,38 @@
 <div style="margin:60px;">
   <h2>Setup Phone</h2>
   <p>
-    Launch Mobicast app on your smartphone and wait for pairing. Once paired,
-    you'll be able to use your phone as a controlling device.
+    Launch MobiCast app on your smartphone and wait for pairing. Alternately, you can scan the QR code below to pair your phone from a web browser.
+  <p>
+    Once paired, you'll be able to use your phone as a controlling device.
   </p>  
   <div id="_mc_phone_setup" class="panel">
+    <div id="_mc_cl_qr_code_container">
+      <img id="_mc_cl_qr_code" style="width:100px;height:100px;">
+    </div>
     Waiting for your phone to connect...
   </div>
   <p>
-    Click SAVE to confirm your settings and start using Mobicast.
+    Click SAVE to confirm your settings and start using MobiCast.
   </p>
   <br />
   <input type="button" value="SAVE" onclick="onSavePhoneSettings();" />
 </div>
 <script>
-// Reset phone status.
-MC.db.setProp(MC.kDbKeyPhoneStatus, 0);
+(function setupPhone() {
+  // Reset phone status.
+  MC.db.setProp(MC.kDbKeyPhoneStatus, 0);
+  
+  // Generate QR code to launch the client page for phone pairing.
+  var host = window.location.hostname;
+  var port = window.location.port;
+  var clientUrl = 'http://' + host;
+  if(port != 80) {
+    clientUrl = clientUrl + ':' + port;
+  }
+  clientUrl = clientUrl + '/client/pairing.html';
+  var getQRUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=100x100&chld=L|0&chl=' + encodeURI(clientUrl);
+  document.getElementById('_mc_cl_qr_code').src = getQRUrl;
+})();
 
 function onSavePhoneSettings() {
   if(MC.db.getProp(MC.kDbKeyPhoneStatus) == 2) {
