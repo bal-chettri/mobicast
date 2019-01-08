@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!--
+ Copyright (C) 2018  Bal Chettri
+ Licensed under GNU GPL(https://www.gnu.org/licenses/gpl.html)
+-->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>MobiCast</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />    
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  
+  <body>
+    <div class="wrapper">      
+      <div id="pair_phone" class="view" style="display:block;">
+        <div class="content padded">
+          <div class="title">Pair Phone</div>
+          <div id="dev_name">
+            <span>Screen</span>
+            <strong><span id="screen-name"></span></strong>
+          </div>
+          <div id="phone_name">
+            <span>Phone</span>
+            <strong><span id="phone-name"></span></strong>
+          </div>
+        </div>
+        <div class="content padded">
+          <button id="btn_pair" type="button">Pair</button>
+        </div>
+      </div>
+      
+      <div id="activate_phone" class="view" style="display:none;">
+        <div class="content padded">
+          <div class="title">Activate Phone</div>
+          <div id="phone_name">
+            <span>Phone</span>
+            <strong><span id="phone-name2"></span></strong>
+          </div>
+        </div>
+        <div class="content padded">
+          <div>
+            Enter passcode shown on your MobiCast screen and press the Activate button.
+          </div>
+        </div>
+        <div class="content padded">
+          <div>
+            <span>Passcode</span>&nbsp;&nbsp;
+            <input type="text" id="passcode" minLength="4" maxLength="4" size="4" spellcheck="false" pattern="[0-9]">
+          </div>
+        </div>
+        <div class="content padded">
+          <button id="btn_activate" type="button">Activate</button>
+        </div>
+      </div>      
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>    
+  </body>
+</html>
+
+<script type="text/javascript">
+var host = window.location.hostname
+var port = window.location.port;
+
+function generateUUID() {
+  var uuid = '';
+  for(var i = 0; i < 16; i++) {
+    var d = parseInt(Math.random() * 9);
+    uuid+= d.toString();
+  }
+  return uuid;
+}
+
+function getPhoneUUID() {
+  var uuid = localStorage.getItem('mc.phone.uuid');
+  if(uuid == null || uuid === undefined) {
+    uuid = generateUUID();
+    localStorage.setItem('mc.phone.uuid', uuid);
+  }
+  return uuid;
+}
+
+function APIURL(api) {
+  let surl = 'http://' + host;
+  if(port != 80) {
+    surl+= ':' + port;
+  }
+  surl+= api;
+  return surl;
+}
+
+function redirectToApp() {
+  location.href = APIURL('/client/index.html');
+}
+
+function onPairPhone() {
+  let id = getPhoneUUID();
+  let name = navigator.appName;
+  
+  let apiUrl = APIURL(`/services/app.jss?cmd=pair_phone&id=${id}&name=${name}`);
+  
+  $.get(apiUrl, (data, textStatus, jqxhr) => {
+    if(textStatus === 'success' && data.status === 'success') {
+      console.log('Phone pairing success');
+      $('#pair_phone').hide();            
+      $('#activate_phone').show();
+    } else {
+      console.log('Phone pairing failed');
+    }
+  });
+}
+
+function onActivatePhone() {  
+  var passcode = $('#passcode').val().trim();
+  
+  if(passcode.length == 4) {
+    var id = getPhoneUUID();
+    
+    let apiUrl = APIURL(`/services/app.jss?cmd=activate_phone&id=${id}&code=${passcode}`);
+    
+    $.get(apiUrl, (data, textStatus, jqxhr) => {    
+      if(textStatus === 'success' && data.status === 'success') {
+          console.log('Phone activation success');
+          redirectToApp();
+        } else {
+          console.log('Phone activation failed');
+          $('#passcode').val('')
+          $('#pair_phone').show();
+          $('#activate_phone').hide();
+        }
+    });
+  }
+}
+
+$(document).ready(function () {
+  var uuid = getPhoneUUID();  
+  console.log('UUID = ' + uuid);
+  
+  $('#screen-name').html(window.location.hostname);
+  $('#phone-name').html(navigator.appName);
+  $('#phone-name2').html(navigator.appName);
+  
+  $('#btn_pair').on('click', onPairPhone);
+  $('#btn_activate').on('click', onActivatePhone);
+});
+
+</script>
