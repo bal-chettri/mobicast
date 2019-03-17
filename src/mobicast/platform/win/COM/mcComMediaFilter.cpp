@@ -82,19 +82,8 @@ STDMETHODIMP CMediaFilter::get_max(int *pRetVal)
     return S_OK;
 }
 
-static void AppendFilter(std::string &str_filter, const char *format, const char *value)
-{
-    if(value != NULL) {
-        char szFilter[100];
-        if(!str_filter.empty()) {
-            str_filter.append(",");
-        }
-        sprintf(szFilter, format, value);
-        str_filter.append(szFilter);
-    }
-}
-
-static void AppendFilter(std::string &str_filter, const char *format, int value)
+template <typename T>
+static void AppendFilter(std::string &str_filter, const char *format, const T &value)
 {
     if(value != 0) {
         char szFilter[100];
